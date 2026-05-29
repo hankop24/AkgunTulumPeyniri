@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Akgün Erzincan Tulum Peyniri | E-Ticaret UI</title>
+    <meta name="description" content="Akgün Erzincan Tulum Peyniri ve yöresel ürünler için modern e-ticaret arayüzü." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div class="announcement">
+      <span>2500 TL üzeri ücretsiz soğuk zincir kargo</span>
+      <span>Geleneksel lezzet, özenle paketlenir</span>
+    </div>
+
+    <header class="site-header" id="top">
+      <a class="brand" href="#top" aria-label="Akgün ana sayfa">
+        <img src="assets/logo-akgun.png" alt="Akgün Erzincan Tulum Peyniri" />
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Menüyü aç/kapat">☰</button>
+
+      <nav class="main-nav" id="mainNav">
+        <a href="#products">Ürünler</a>
+        <a href="#featured">Öne Çıkanlar</a>
+        <a href="#story">Marka Hikayesi</a>
+        <a href="#quality">Kalite</a>
+        <a href="#faq">SSS</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="ghost-btn">Giriş Yap</button>
+
+        <button class="cart-btn" id="cartOpen">
+          Sepet <span id="cartCount">0</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Akgün Erzincan Tulum Peyniri</p>
+
+          <h1>Doğal, sade ve premium bir yöresel ürün deneyimi.</h1>
+
+          <p class="hero-text">
+            Geleneksel Erzincan lezzetlerini modern ambalajla buluşturan Akgün,
+            tulum peynirinden bala, kaşardan pekmeze kadar sofralara güven veren
+            bir tat taşır.
+          </p>
+
+          <div class="hero-actions">
+            <a class="primary-btn" href="#products">Ürünleri İncele</a>
+            <a class="secondary-btn" href="#story">Markayı Tanı</a>
+          </div>
+
+          <div class="hero-stats">
+            <div>
+              <strong>100%</strong>
+              <span>Doğal lezzet</span>
+            </div>
+
+            <div>
+              <strong>24s</strong>
+              <span>Hızlı dönüş</span>
+            </div>
+
+            <div>
+              <strong>4.9</strong>
+              <span>Müşteri puanı</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="product-glow"></div>
+          <img src="assets/product-family.png" alt="Akgün ürün ailesi" />
+          <div class="floating-card top-card">Soğuk zincir teslimat</div>
+          <div class="floating-card bottom-card">Taze paketleme</div>
+        </div>
+      </section>
+
+      <section class="benefits" id="quality">
+        <article>
+          <span>01</span>
+          <h3>Katkısız Lezzet</h3>
+          <p>Sade içerik, yoğun aroma ve güven veren üretim yaklaşımı.</p>
+        </article>
+
+        <article>
+          <span>02</span>
+          <h3>Premium Ambalaj</h3>
+          <p>Logo ve etiket dili, e-ticaret ve raf görünümü için temiz tasarlandı.</p>
+        </article>
+
+        <article>
+          <span>03</span>
+          <h3>Güvenli Teslimat</h3>
+          <p>Ürünler tazeliğini koruyacak şekilde paketlenir ve gönderilir.</p>
+        </article>
+      </section>
+
+      <section class="featured-showcase" id="featured">
+        <div class="section-heading compact">
+          <p class="eyebrow">Seçili Ürünler</p>
+          <h2>Markanın vitrindeki güçlü ürünleri.</h2>
+          <p>
+            Kavanoz, vakum paket, gurme sarım ve set ürünlerini hızlıca
+            inceleyebilmen için ayrı bir vitrin alanı ekledim.
+          </p>
+        </div>
+
+        <div class="featured-grid" id="featuredGrid"></div>
+      </section>
+
+      <section class="section-heading" id="products">
+        <p class="eyebrow">Online Mağaza</p>
+        <h2>Ürünler</h2>
+        <p>
+          Tulum peyniri, kaşar, bal, tereyağı, pekmez ve diğer yöresel ürünleri
+          daha düzenli filtre, arama ve ürün detay yapısıyla listeledim.
+        </p>
+      </section>
+
+      <section class="shop-toolbar" aria-label="Ürün kategorileri">
+        <div class="category-chips" id="categoryChips"></div>
+      </section>
+
+      <section class="shop-layout">
+        <aside class="filters">
+          <h3>Filtrele</h3>
+
+          <label>
+            <span>Ürün ara</span>
+            <input id="searchInput" type="search" placeholder="Tulum, kaşar, pekmez..." />
+          </label>
+
+          <label>
+            <span>Ürün tipi</span>
+            <select id="categoryFilter">
+              <option value="all">Tümü</option>
+              <option value="tulum">Tulum Peynirleri</option>
+              <option value="bal">Bal</option>
+              <option value="kasar">Kaşar Peynirleri</option>
+              <option value="tereyagi">Tereyağı</option>
+              <option value="salamura">Salamura Peynirler</option>
+              <option value="pekmez">Pekmezler</option>
+              <option value="fasulye">Fasulye</option>
+              <option value="diger-peynir">Diğer Peynirler</option>
+              <option value="kuru-meyve">Kuru Meyve</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Gramaj</span>
+            <select id="weightFilter">
+              <option value="all">Tüm gramajlar</option>
+              <option value="500g">500g</option>
+              <option value="650g">650g</option>
+              <option value="700g">700g</option>
+              <option value="800g">800g</option>
+              <option value="1000g">1000g</option>
+              <option value="set">Set ürünler</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Sıralama</span>
+            <select id="sortFilter">
+              <option value="popular">Popüler</option>
+              <option value="rating">Puanı yüksek</option>
+              <option value="price-asc">Fiyat artan</option>
+              <option value="price-desc">Fiyat azalan</option>
+            </select>
+          </label>
+
+          <label class="stock-toggle">
+            <input id="stockFilter" type="checkbox" />
+            <span>Sadece stokta olanlar</span>
+          </label>
+
+          <div class="filter-note">
+            <strong>Not:</strong> Ürünler, gramajlar ve fiyatlar taslak amaçlıdır.
+            Gerçek bilgiler daha sonra kolayca güncellenebilir.
+          </div>
+        </aside>
+
+        <div class="product-area">
+          <div class="product-area-head">
+            <strong id="productCounter">Ürünler yükleniyor</strong>
+            <span>Detay için ürüne tıklayabilir, hızlıca sepete ekleyebilirsin.</span>
+          </div>
+
+          <div class="product-grid" id="productGrid"></div>
+        </div>
+      </section>
+
+      <section class="story" id="story">
+        <div>
+          <p class="eyebrow">Marka Hikayesi</p>
+          <h2>Minimal tasarım, geleneksel Erzincan lezzeti.</h2>
+          <p>
+            Akgün için hazırlanan bu UI, markanın sade logosuna uygun olarak krem,
+            koyu yeşil ve altın tonlarıyla tasarlandı. Amaç; güvenilir, temiz ve
+            premium bir Erzincan yöresel ürün markası hissi vermek.
+          </p>
+        </div>
+
+        <img src="assets/product-wrap.png" alt="Akgün paket mockup" />
+      </section>
+
+      <section class="testimonials">
+        <div class="section-heading compact">
+          <p class="eyebrow">Yorumlar</p>
+          <h2>Sofralardan gelenler</h2>
+        </div>
+
+        <div class="testimonial-grid">
+          <article>
+            <p>“Ambalaj çok temiz, ürün premium duruyor. Kahvaltıda güçlü ve dengeli bir tat bıraktı.”</p>
+            <strong>Elif K.</strong>
+          </article>
+
+          <article>
+            <p>“E-ticaret için güven veren bir marka algısı var. Ürün kartları çok sade ve anlaşılır.”</p>
+            <strong>Murat A.</strong>
+          </article>
+
+          <article>
+            <p>“Tulum peynirini hediye paketi gibi sunmak güzel fikir. Logo ambalajda çok şık duruyor.”</p>
+            <strong>Selin D.</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="faq" id="faq">
+        <div class="section-heading compact">
+          <p class="eyebrow">SSS</p>
+          <h2>Sık Sorulan Sorular</h2>
+        </div>
+
+        <details open>
+          <summary>Kargo nasıl yapılır?</summary>
+          <p>Soğuk zincir mantığına uygun koruyucu ambalajla gönderim yapılacak şekilde tasarlanmıştır.</p>
+        </details>
+
+        <details>
+          <summary>Ürün bilgileri gerçek mi?</summary>
+          <p>Bu dosyada ürün isimleri, gramajlar ve fiyatlar UI sunumu için örnektir. Gerçek veriler daha sonra düzenlenebilir.</p>
+        </details>
+
+        <details>
+          <summary>Bu site ödeme alıyor mu?</summary>
+          <p>Hayır. Bu ilk sürüm UI/prototip amaçlıdır. Ödeme entegrasyonu daha sonra eklenebilir.</p>
+        </details>
+
+        <details>
+          <summary>Ürün detayları nasıl düzenlenir?</summary>
+          <p>Ürün adı, fiyat, gramaj, stok ve görsel bilgileri script.js dosyasındaki ürün listesinden kolayca değiştirilebilir.</p>
+        </details>
+
+        <details>
+          <summary>WhatsApp sipariş nasıl çalışır?</summary>
+          <p>Sepete eklenen ürünler otomatik sipariş metnine çevrilir ve WhatsApp bağlantısına aktarılır.</p>
+        </details>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <img src="assets/logo-akgun.png" alt="Akgün Erzincan Tulum Peyniri" />
+        <p>Geleneksel Erzincan lezzetlerinin modern e-ticaret deneyimi.</p>
+      </div>
+
+      <div class="footer-links">
+        <a href="#products">Ürünler</a>
+        <a href="#quality">Kalite</a>
+        <a href="#faq">SSS</a>
+        <a href="https://wa.me/905000000000" target="_blank">WhatsApp</a>
+      </div>
+    </footer>
+
+    <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+      <div class="cart-header">
+        <h3>Sepetim</h3>
+        <button id="cartClose" aria-label="Sepeti kapat">×</button>
+      </div>
+
+      <div class="cart-items" id="cartItems"></div>
+
+      <div class="cart-summary">
+        <div class="shipping-progress">
+          <span id="cartShipping">Ücretsiz kargo için ürün ekleyin.</span>
+          <i><b id="cartProgress"></b></i>
+        </div>
+
+        <div>
+          <span>Ara Toplam</span>
+          <strong id="cartTotal">₺0</strong>
+        </div>
+
+        <button class="primary-btn full" id="checkoutButton">WhatsApp ile Siparişi Tamamla</button>
+      </div>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <aside class="product-modal" id="productModal" aria-hidden="true">
+      <div class="modal-header">
+        <span>Ürün Detayı</span>
+        <button id="modalClose" aria-label="Ürün detayını kapat">×</button>
+      </div>
+
+      <div class="modal-body" id="modalBody"></div>
+    </aside>
+
+    <div class="mobile-contact-bar" aria-label="Hızlı iletişim">
+      <a href="https://wa.me/905000000000" target="_blank" rel="noopener">SORU SOR</a>
+      <a href="tel:+905000000000">TELEFON ET</a>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+      /*
+        SADECE GÖRSEL DÜZELTME KISMI
+        Bu script mevcut script.js yapısını, sepeti, filtreyi ve tasarımı değiştirmez.
+        Görseli olmayan ürünlere ürüne uygun sabit internet görselleri bağlar.
+      */
+
+      const internetProductImages = {
+        "Bal": "https://loremflickr.com/900/700/honey,jar?lock=1001",
+
+        "Kaşar Peyniri": "https://loremflickr.com/900/700/cheese,block?lock=1002",
+        "Göbek Kaşar": "https://loremflickr.com/900/700/cheese,wheel?lock=1003",
+        "Kolot Kaşar": "https://loremflickr.com/900/700/cheese,dairy?lock=1004",
+        "Karadaş Tost Kaşar": "https://loremflickr.com/900/700/toast,cheese?lock=1005",
+
+        "Karadaş Yemeklik Tereyağı": "https://loremflickr.com/900/700/butter,block?lock=1006",
+        "Yayık Yağı": "https://loremflickr.com/900/700/butter,jar?lock=1007",
+
+        "Erzincan Salamura İnek Peyniri": "https://loremflickr.com/900/700/white,cheese?lock=1008",
+        "Erzurum Göğermiş Peyniri": "https://loremflickr.com/900/700/blue,cheese?lock=1009",
+        "Çeçil Peyniri": "https://loremflickr.com/900/700/string,cheese?lock=1010",
+        "Dil Peyniri": "https://loremflickr.com/900/700/mozzarella,cheese?lock=1011",
+        "Örgü Peyniri": "https://loremflickr.com/900/700/braided,cheese?lock=1012",
+        "Van Otlu Peyniri": "https://loremflickr.com/900/700/herb,cheese?lock=1013",
+        "Koyun Ezine Peyniri": "https://loremflickr.com/900/700/feta,cheese?lock=1014",
+        "İnek Ezine Peyniri": "https://loremflickr.com/900/700/cheese,block?lock=1015",
+
+        "Erzincan Dut Pekmezi": "https://loremflickr.com/900/700/molasses,jar?lock=1016",
+        "Erzincan Karadut Pekmezi": "https://loremflickr.com/900/700/mulberry,syrup?lock=1017",
+
+        "Erzincan Dermason Fasulye": "https://loremflickr.com/900/700/white,beans?lock=1018",
+        "Erzincan Şeker Fasulye": "https://loremflickr.com/900/700/beans,dry?lock=1019",
+
+        "Erzincan Kuru Kayısı": "https://loremflickr.com/900/700/dried,apricots?lock=1020"
+      };
+
+      const internetProductFallbacks = {
+        "Bal": "https://placehold.co/900x700/f7d36b/17382b?text=Bal",
+        "Kaşar Peyniri": "https://placehold.co/900x700/f3d36b/17382b?text=Kasar+Peyniri",
+        "Göbek Kaşar": "https://placehold.co/900x700/f3d36b/17382b?text=Gobek+Kasar",
+        "Kolot Kaşar": "https://placehold.co/900x700/f3d36b/17382b?text=Kolot+Kasar",
+        "Karadaş Tost Kaşar": "https://placehold.co/900x700/f3d36b/17382b?text=Tost+Kasar",
+        "Karadaş Yemeklik Tereyağı": "https://placehold.co/900x700/f8e08c/17382b?text=Tereyagi",
+        "Yayık Yağı": "https://placehold.co/900x700/f8e08c/17382b?text=Yayik+Yagi",
+        "Erzincan Salamura İnek Peyniri": "https://placehold.co/900x700/faf3df/17382b?text=Salamura+Peynir",
+        "Erzurum Göğermiş Peyniri": "https://placehold.co/900x700/e9efe8/17382b?text=Gogermis+Peynir",
+        "Çeçil Peyniri": "https://placehold.co/900x700/faf3df/17382b?text=Cecil+Peyniri",
+        "Dil Peyniri": "https://placehold.co/900x700/faf3df/17382b?text=Dil+Peyniri",
+        "Örgü Peyniri": "https://placehold.co/900x700/faf3df/17382b?text=Orgu+Peyniri",
+        "Van Otlu Peyniri": "https://placehold.co/900x700/e9f1dc/17382b?text=Van+Otlu+Peynir",
+        "Koyun Ezine Peyniri": "https://placehold.co/900x700/faf3df/17382b?text=Koyun+Ezine",
+        "İnek Ezine Peyniri": "https://placehold.co/900x700/faf3df/17382b?text=Inek+Ezine",
+        "Erzincan Dut Pekmezi": "https://placehold.co/900x700/5b2d20/fff7e8?text=Dut+Pekmezi",
+        "Erzincan Karadut Pekmezi": "https://placehold.co/900x700/3f2032/fff7e8?text=Karadut+Pekmezi",
+        "Erzincan Dermason Fasulye": "https://placehold.co/900x700/efe3c8/17382b?text=Dermason+Fasulye",
+        "Erzincan Şeker Fasulye": "https://placehold.co/900x700/efe3c8/17382b?text=Seker+Fasulye",
+        "Erzincan Kuru Kayısı": "https://placehold.co/900x700/e99a3f/17382b?text=Kuru+Kayisi"
+      };
+
+      function updateProductImageData() {
+        if (typeof products === "undefined" || !Array.isArray(products)) return;
+
+        products.forEach((product) => {
+          if (internetProductImages[product.title]) {
+            product.image = internetProductImages[product.title];
+          }
+        });
+      }
+
+      function attachImageFallbacks() {
+        document.querySelectorAll("img").forEach((img) => {
+          const alt = img.getAttribute("alt") || "";
+          const fallback = internetProductFallbacks[alt];
+
+          if (!fallback) return;
+
+          img.onerror = function () {
+            this.onerror = null;
+            this.src = fallback;
+          };
+        });
+      }
+
+      function rerenderAfterImagePatch() {
+        updateProductImageData();
+
+        if (typeof renderFeaturedProducts === "function") {
+          renderFeaturedProducts();
+        }
+
+        if (typeof renderProducts === "function") {
+          renderProducts();
+        }
+
+        if (typeof renderCart === "function") {
+          renderCart();
+        }
+
+        attachImageFallbacks();
+      }
+
+      rerenderAfterImagePatch();
+
+      const imageObserver = new MutationObserver(() => {
+        attachImageFallbacks();
+      });
+
+      imageObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+    </script>
+  </body>
+</html>
