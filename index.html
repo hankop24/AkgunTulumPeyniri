@@ -445,4 +445,72 @@
       });
     </script>
   </body>
+  <a
+  class="whatsapp-fixed"
+  href="https://wa.me/905000000000?text=Merhaba%2C%20Akg%C3%BCn%20Erzincan%20Tulum%20Peyniri%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum."
+  target="_blank"
+  rel="noopener"
+  aria-label="WhatsApp ile iletişime geç"
+>
+  <svg viewBox="0 0 32 32" aria-hidden="true">
+    <path
+      d="M16.02 3.2C9 3.2 3.3 8.82 3.3 15.74c0 2.27.62 4.48 1.8 6.42L3.2 29l7.05-1.83a12.85 12.85 0 0 0 5.77 1.4c7.02 0 12.72-5.62 12.72-12.54S23.04 3.2 16.02 3.2Zm0 23.23c-1.82 0-3.6-.48-5.15-1.39l-.37-.22-4.18 1.09 1.12-4.03-.25-.39a10.22 10.22 0 0 1-1.58-5.45c0-5.75 4.66-10.43 10.4-10.43 5.75 0 10.43 4.68 10.43 10.43 0 5.74-4.68 10.39-10.42 10.39Zm5.72-7.78c-.31-.16-1.84-.91-2.12-1.01-.29-.11-.5-.16-.71.16-.21.31-.82 1.01-1 1.22-.18.21-.37.23-.68.08-.31-.16-1.32-.49-2.52-1.55-.93-.83-1.56-1.85-1.74-2.16-.18-.31-.02-.48.14-.64.14-.14.31-.37.47-.55.16-.18.21-.31.31-.52.1-.21.05-.39-.03-.55-.08-.16-.71-1.7-.97-2.33-.26-.61-.52-.53-.71-.54h-.6c-.21 0-.55.08-.84.39-.29.31-1.1 1.08-1.1 2.62s1.13 3.04 1.29 3.25c.16.21 2.23 3.4 5.4 4.76.75.32 1.34.52 1.8.66.76.24 1.45.21 2 .13.61-.09 1.84-.75 2.1-1.48.26-.73.26-1.35.18-1.48-.08-.13-.29-.21-.6-.37Z"
+    />
+  </svg>
+  <span>WhatsApp</span>
+</a>
+
+<style>
+  .whatsapp-fixed {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 9999;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    border-radius: 999px;
+    background: #25d366;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: 0 18px 42px rgba(37, 211, 102, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .whatsapp-fixed:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 22px 48px rgba(37, 211, 102, 0.45);
+  }
+
+  .whatsapp-fixed svg {
+    width: 25px;
+    height: 25px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .whatsapp-fixed {
+      right: 16px;
+      bottom: 78px;
+      width: 56px;
+      height: 56px;
+      padding: 0;
+      justify-content: center;
+    }
+
+    .whatsapp-fixed span {
+      display: none;
+    }
+
+    .whatsapp-fixed svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+</style>
 </html>
