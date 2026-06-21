@@ -1315,54 +1315,16 @@ h2 {
   }
 }
 
-
-.add-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
-
-.whatsapp-fixed {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  z-index: 9999;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 15px 20px;
-  border-radius: 999px;
-  background: #25d366;
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 800;
-  text-decoration: none;
-  box-shadow: 0 18px 42px rgba(37, 211, 102, 0.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.whatsapp-fixed:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 22px 48px rgba(37, 211, 102, 0.45);
-}
-
-.whatsapp-fixed svg {
-  width: 25px;
-  height: 25px;
-  fill: currentColor;
-  flex-shrink: 0;
-}
-
+/* Ürün galerisi ve puansız ürün kartı güncellemesi */
+.best-seller-badge { top: 58px; background: #17382b; color: #fff7e8; }
+.modal-gallery { display: grid; gap: 12px; align-content: start; }
+.modal-product-image img { width: 100%; height: 100%; display: block; }
+.modal-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.modal-thumb { border: 1px solid rgba(23, 56, 43, .14); border-radius: 14px; overflow: hidden; padding: 0; background: #fffaf1; cursor: pointer; height: 76px; }
+.modal-thumb.active { outline: 3px solid rgba(184, 142, 63, .28); border-color: #b88e3f; }
+.modal-thumb img { width: 100%; height: 100%; display: block; }
+.stock-line { justify-content: flex-end; }
 @media (max-width: 768px) {
-  .whatsapp-fixed {
-    right: 16px;
-    bottom: 78px;
-    width: 56px;
-    height: 56px;
-    padding: 0;
-    justify-content: center;
-  }
-
-  .whatsapp-fixed span { display: none; }
-  .whatsapp-fixed svg { width: 28px; height: 28px; }
+  .modal-thumbs { grid-template-columns: repeat(3, 1fr); }
+  .modal-thumb { height: 64px; }
 }

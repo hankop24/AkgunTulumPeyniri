@@ -78,6 +78,17 @@ export async function resetProducts() {
   return getProducts();
 }
 
+
+function normalizeProductImages(product) {
+  const fromImages = Array.isArray(product.images) ? product.images : [];
+  const fromLegacy = product.image ? [product.image] : [];
+  const list = [...fromImages, ...fromLegacy]
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+  const unique = [...new Set(list)];
+  return unique.length ? unique : ["assets/product-akgun.png"];
+}
+
 export function normalizeProduct(product) {
   return {
     id: String(product.id || Date.now()),
@@ -87,16 +98,19 @@ export function normalizeProduct(product) {
     oldPrice: Number(product.oldPrice || 0),
     category: String(product.category || "tulum"),
     badge: String(product.badge || ""),
-    image: String(product.image || "assets/product-akgun.png"),
+    image: normalizeProductImages(product)[0],
+    images: normalizeProductImages(product),
+    imageFit: ["cover", "contain"].includes(product.imageFit) ? product.imageFit : "cover",
+    imagePosition: String(product.imagePosition || "center center"),
     weight: String(product.weight || "500g"),
     origin: String(product.origin || "Erzincan"),
     stock: Number(product.stock || 0),
-    rating: Number(product.rating || 4.5),
+    rating: Number(product.rating || 0),
     tags: parseTags(product.tags),
     featured: Boolean(product.featured),
     bestSeller: Boolean(product.bestSeller),
     active: product.active !== false,
-    campaignActive: Boolean(product.campaignActive || product.oldPrice > product.price),
+    campaignActive: Boolean(product.campaignActive),
     order: Number(product.order || 999)
   };
 }
@@ -113,10 +127,13 @@ export function createEmptyProduct(products = []) {
     category: "tulum",
     badge: "Yeni",
     image: "assets/product-akgun.png",
+    images: ["assets/product-akgun.png"],
+    imageFit: "cover",
+    imagePosition: "center center",
     weight: "500g",
     origin: "Erzincan",
     stock: 0,
-    rating: 4.5,
+    rating: 0,
     tags: ["Yöresel"],
     featured: false,
     bestSeller: false,

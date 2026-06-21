@@ -129,7 +129,7 @@ function getVisibleProducts() {
   if (onlyStock) list = list.filter((product) => product.stock > 0);
   if (sort === "price-asc") list.sort((a, b) => a.price - b.price);
   if (sort === "price-desc") list.sort((a, b) => b.price - a.price);
-  if (sort === "rating") list.sort((a, b) => b.rating - a.rating);
+  if (sort === "rating") list.sort((a, b) => Number(a.order || 999) - Number(b.order || 999));
   if (sort === "popular") list.sort((a, b) => Number(b.bestSeller) - Number(a.bestSeller) || Number(a.order || 999) - Number(b.order || 999));
   return list;
 }
@@ -164,13 +164,29 @@ function imageSrc(image) {
   return image || "assets/product-akgun.png";
 }
 
+function productImages(product = {}) {
+  const list = Array.isArray(product.images) ? product.images : [];
+  const legacy = product.image ? [product.image] : [];
+  const merged = [...list, ...legacy].map((item) => String(item || "").trim()).filter(Boolean);
+  const unique = [...new Set(merged)];
+  return unique.length ? unique : ["assets/product-akgun.png"];
+}
+
+function mainProductImage(product = {}) {
+  return productImages(product)[0] || "assets/product-akgun.png";
+}
+
+function imageStyle(product = {}) {
+  return `object-fit:${product.imageFit || "cover"};object-position:${product.imagePosition || "center center"}`;
+}
+
 function renderFeaturedProducts() {
   const featuredGrid = qs("#featuredGrid");
   if (!featuredGrid) return;
   const featured = products.filter((product) => product.featured).slice(0, 4);
   featuredGrid.innerHTML = featured.map((product) => `
     <button class="featured-card" data-id="${product.id}">
-      <img src="${imageSrc(product.image)}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" />
+      <img src="${imageSrc(mainProductImage(product))}" style="${imageStyle(product)}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" />
       <span>${product.badge || "Seçili"}</span>
       <strong>${product.title}</strong>
       <small>${money(product.price)} · ${product.weight}</small>
@@ -198,8 +214,9 @@ function renderProducts() {
     return `
       <article class="product-card">
         <div class="product-image">
-          <img src="${imageSrc(product.image)}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" />
+          <img src="${imageSrc(mainProductImage(product))}" style="${imageStyle(product)}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" />
           ${product.badge ? `<span class="badge">${product.badge}</span>` : ""}
+          ${product.bestSeller ? `<span class="badge best-seller-badge">Çok satan</span>` : ""}
           ${discount > 0 ? `<span class="discount-badge">%${discount}</span>` : ""}
         </div>
         <div class="product-info">
@@ -208,7 +225,6 @@ function renderProducts() {
           <p>${product.desc}</p>
           <div class="product-tags">${(product.tags || []).slice(0, 3).map((tag) => `<span>${tag}</span>`).join("")}</div>
           <div class="stock-line ${stockClass}">
-            <span>★ ${product.rating}</span>
             <span>${product.stock <= 0 ? "Stok yok" : product.stock <= lowStockLimit ? "Az kaldı" : "Stokta"}</span>
           </div>
           <div class="product-meta">
@@ -284,7 +300,7 @@ function renderCart() {
 
   cartItems.innerHTML = cart.map((item) => `
     <div class="cart-item">
-      <img src="${imageSrc(item.image)}" onerror="this.src='assets/product-akgun.png'" alt="${item.title}" />
+      <img src="${imageSrc(mainProductImage(item))}" style="${imageStyle(item)}" onerror="this.src='assets/product-akgun.png'" alt="${item.title}" />
       <div><h4>${item.title}</h4><p>${money(item.price)} · ${item.qty} adet · ${item.weight}</p></div>
       <div class="qty-controls">
         <button data-id="${item.id}" data-dir="-1">−</button>
@@ -317,8 +333,15 @@ function openProductModal(productId) {
   const productModal = qs("#productModal");
   if (!product || !modalBody || !productModal) return;
   modalProductId = productId;
+  const images = productImages(product);
   modalBody.innerHTML = `
-    <div class="modal-product-image"><img src="${imageSrc(product.image)}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" /></div>
+    <div class="modal-gallery">
+      <div class="modal-product-image"><img id="modalMainImage" src="${imageSrc(images[0])}" style="${imageStyle(product)}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" /></div>
+      ${images.length > 1 ? `<div class="modal-thumbs">${images.map((image, index) => `
+        <button class="modal-thumb ${index === 0 ? "active" : ""}" data-modal-image="${index}">
+          <img src="${imageSrc(image)}" style="${imageStyle(product)}" onerror="this.src='assets/product-akgun.png'" alt="${product.title} görsel ${index + 1}" />
+        </button>`).join("")}</div>` : ""}
+    </div>
     <div class="modal-product-info">
       <p class="eyebrow">${categoryLabels[product.category] || product.category}</p>
       <h2>${product.title}</h2>
@@ -326,8 +349,8 @@ function openProductModal(productId) {
       <div class="modal-specs">
         <span><strong>Gramaj</strong>${product.weight}</span>
         <span><strong>Menşei</strong>${product.origin}</span>
-        <span><strong>Puan</strong>${product.rating}</span>
         <span><strong>Stok</strong>${product.stock} adet</span>
+        ${product.bestSeller ? `<span><strong>Durum</strong>Çok satan</span>` : ""}
       </div>
       <div class="product-tags modal-tags">${(product.tags || []).map((tag) => `<span>${tag}</span>`).join("")}</div>
       <div class="modal-price-row">
@@ -338,9 +361,14 @@ function openProductModal(productId) {
   productModal.classList.add("open");
   qs("#overlay")?.classList.add("open");
   productModal.setAttribute("aria-hidden", "false");
+  qsa(".modal-thumb").forEach((button) => button.addEventListener("click", () => {
+    const index = Number(button.dataset.modalImage || 0);
+    const main = qs("#modalMainImage");
+    if (main && images[index]) main.src = imageSrc(images[index]);
+    qsa(".modal-thumb").forEach((thumb) => thumb.classList.toggle("active", thumb === button));
+  }));
   qs("#modalAddToCart")?.addEventListener("click", () => { closeProductModal(); addToCart(productId); });
 }
-
 function closeProductModal() {
   const productModal = qs("#productModal");
   productModal?.classList.remove("open");

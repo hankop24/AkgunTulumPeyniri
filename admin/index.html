@@ -35,6 +35,7 @@
           <button class="active" data-view="dashboard">Panel Özeti</button>
           <button data-view="products">Ürün Yönetimi</button>
           <button data-view="sections">Sayfa Bölümleri</button>
+          <button data-view="categories">Kategori Yönetimi</button>
           <button data-view="settings">Site Ayarları</button>
           <button data-view="data">Veri & Yayın</button>
         </nav>
@@ -110,8 +111,9 @@
                 <option value="all">Tüm durumlar</option>
                 <option value="active">Sitede görünenler</option>
                 <option value="passive">Gizlenenler</option>
-                <option value="featured">Öne çıkanlar</option>
-                <option value="campaign">Kampanyalar</option>
+                <option value="featured">Öne çıkanlarda gösterilenler</option>
+                <option value="bestSeller">Çok satan olarak işaretlenenler</option>
+                <option value="campaign">Kampanyası aktif olanlar</option>
                 <option value="low-stock">Düşük stok</option>
               </select>
             </div>
@@ -138,10 +140,10 @@
               <label>Ürün adı<input id="editorTitleInput" required placeholder="Örn. Erzincan Tulum Peyniri" /></label>
               <label>Kısa açıklama<textarea id="editorDesc" rows="5" placeholder="Ürünün sitede görünen açıklaması"></textarea></label>
               <div class="form-grid two">
-                <label>Kategori<select id="editorCategory"></select></label>
+                <label class="category-field">Kategori<select id="editorCategory"></select><button class="inline-add-button" type="button" id="quickAddCategoryButton">+ Yeni kategori ekle</button></label>
                 <label>Gramaj / Paket<input id="editorWeight" placeholder="500g / 1kg / Set" /></label>
                 <label>Menşei<input id="editorOrigin" placeholder="Erzincan" /></label>
-                <label>Sıralama<input id="editorOrder" type="number" min="1" /></label>
+                <label>Liste sırası<input id="editorOrder" type="number" min="1" /><small>Bu sayı ürünlerin ekranda hangi öncelikle görüneceğini belirler. Küçük sayı daha önce görünür.</small></label>
               </div>
               <label>Etiketler<textarea id="editorTags" rows="3" placeholder="Her etiketi virgülle ayır: Katkısız, Vakum paket, Soğuk zincir"></textarea></label>
             </section>
@@ -152,24 +154,58 @@
                 <label>Satış fiyatı<input id="editorPrice" type="number" min="0" /></label>
                 <label>Eski fiyat<input id="editorOldPrice" type="number" min="0" /></label>
                 <label>Stok adedi<input id="editorStock" type="number" min="0" /></label>
-                <label>Puan<input id="editorRating" type="number" min="0" max="5" step="0.1" /></label>
               </div>
-              <label>Ürün rozeti<input id="editorBadge" placeholder="Yeni / Kampanya / Çok Satan" /></label>
-              <div class="switch-stack">
-                <label><input id="editorActive" type="checkbox" /> Sitede görünsün</label>
-                <label><input id="editorFeatured" type="checkbox" /> Öne çıkanlarda göster</label>
-                <label><input id="editorBestSeller" type="checkbox" /> Çok satan olarak işaretle</label>
-                <label><input id="editorCampaign" type="checkbox" /> Kampanya aktif</label>
+              <label>Ürün rozeti
+                <input id="editorBadge" list="badgeOptions" placeholder="Yeni / Kampanya / Çok Satan / Premium" />
+                <datalist id="badgeOptions">
+                  <option value="Yeni"></option>
+                  <option value="Çok Satan"></option>
+                  <option value="Kampanya"></option>
+                  <option value="Premium"></option>
+                  <option value="Sınırlı Stok"></option>
+                  <option value="Özel Ürün"></option>
+                  <option value="Set"></option>
+                </datalist>
+                <small>İstersen listeden seç, istersen kendin yaz.</small>
+              </label>
+              <div class="switch-stack separated-switches">
+                <label><input id="editorActive" type="checkbox" /> <span><strong>Sitede görünsün</strong><small>Kapalı olursa ürün canlı sitede listelenmez.</small></span></label>
+                <label><input id="editorFeatured" type="checkbox" /> <span><strong>Öne çıkanlarda göster</strong><small>Ürünü ana sayfadaki öne çıkanlar vitrini içine alır.</small></span></label>
+                <label><input id="editorBestSeller" type="checkbox" /> <span><strong>Çok satan olarak işaretle</strong><small>Ürün kartında/listesinde ayrı bir durum etiketi olarak kullanılır.</small></span></label>
+                <label><input id="editorCampaign" type="checkbox" /> <span><strong>Kampanya aktif</strong><small>Kampanya filtrelerinde görünür. Eski fiyatı ayrıca girmen önerilir.</small></span></label>
               </div>
             </section>
 
             <section class="panel-card editor-card image-editor-card">
-              <h3>Ürün Görseli</h3>
+              <h3>Ürün Görselleri</h3>
+              <p class="field-help">Birden fazla görsel ekleyebilirsin. İlk görsel ürün kartında kapak olarak görünür; ürün detayında tüm görseller arasında geçiş yapılır.</p>
               <div class="image-preview" id="productImagePreview">Görsel yok</div>
-              <label>Görsel yolu / URL<input id="editorImage" placeholder="assets/product-tub.png veya https://..." /></label>
+              <div class="gallery-preview" id="productGalleryPreview"></div>
+              <label>Görsel URL / yolu ekle<input id="editorImageUrl" placeholder="assets/product-tub.png veya https://..." /></label>
+              <div class="inline-actions">
+                <button class="btn soft" type="button" id="addImageUrlButton">URL'yi Galeriye Ekle</button>
+                <button class="btn ghost" type="button" id="clearImagesButton">Görselleri Temizle</button>
+              </div>
               <label class="file-drop">Bilgisayardan görsel seç
-                <input id="editorImageFile" type="file" accept="image/*" />
+                <input id="editorImageFile" type="file" accept="image/*" multiple />
               </label>
+              <div class="form-grid two">
+                <label>Görsel kırpma / görünüm
+                  <select id="editorImageFit">
+                    <option value="cover">Alanı doldur / kırp</option>
+                    <option value="contain">Tamamı görünsün</option>
+                  </select>
+                </label>
+                <label>Görsel odak noktası
+                  <select id="editorImagePosition">
+                    <option value="center center">Orta</option>
+                    <option value="top center">Üst</option>
+                    <option value="bottom center">Alt</option>
+                    <option value="center left">Sol</option>
+                    <option value="center right">Sağ</option>
+                  </select>
+                </label>
+              </div>
               <small>Dosya seçersen görsel Firebase Storage’a yüklenir ve ürün kaydına otomatik bağlantı olarak eklenir.</small>
             </section>
           </form>
@@ -191,6 +227,14 @@
             </aside>
 
             <div class="sections-editor" id="sectionsEditor"></div>
+          </div>
+        </section>
+
+        <section class="view" id="categoriesView" data-title="Kategori Yönetimi" data-desc="Ürün kategorilerini ekle, düzenle, gizle veya sıralamasını değiştir.">
+          <div class="panel-card">
+            <div class="block-title"><div><h2>Kategoriler</h2><p>Yeni ürün eklerken görünen kategori listesini buradan yönetirsin.</p></div><button class="btn primary" id="saveCategoriesButton">Kategorileri Kaydet</button></div>
+            <div id="categoryManager"></div>
+            <div class="form-footer"><button class="btn soft" id="addCategoryManagerButton">+ Yeni kategori ekle</button></div>
           </div>
         </section>
 

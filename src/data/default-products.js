@@ -6,8 +6,11 @@ export const defaultProducts = [
     "price": 690,
     "oldPrice": 760,
     "category": "tulum",
-    "badge": "Çok satan",
+    "badge": "Kavanoz",
     "image": "assets/product-tub.png",
+    "images": ["assets/product-tub.png"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "1000g",
     "origin": "Erzincan",
     "stock": 18,
@@ -19,7 +22,8 @@ export const defaultProducts = [
     ],
     "featured": true,
     "bestSeller": true,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 2,
@@ -30,6 +34,9 @@ export const defaultProducts = [
     "category": "tulum",
     "badge": "Yeni",
     "image": "assets/product-vacuum.png",
+    "images": ["assets/product-vacuum.png"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Erzincan",
     "stock": 24,
@@ -41,7 +48,8 @@ export const defaultProducts = [
     ],
     "featured": true,
     "bestSeller": true,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 3,
@@ -52,6 +60,9 @@ export const defaultProducts = [
     "category": "tulum",
     "badge": "Premium",
     "image": "assets/product-wrap.png",
+    "images": ["assets/product-wrap.png"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "650g",
     "origin": "Erzincan",
     "stock": 11,
@@ -63,7 +74,8 @@ export const defaultProducts = [
     ],
     "featured": true,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 4,
@@ -74,6 +86,9 @@ export const defaultProducts = [
     "category": "tulum",
     "badge": "Set",
     "image": "assets/product-family.png",
+    "images": ["assets/product-family.png"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "Set",
     "origin": "Erzincan",
     "stock": 8,
@@ -85,7 +100,8 @@ export const defaultProducts = [
     ],
     "featured": true,
     "bestSeller": true,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 5,
@@ -96,6 +112,9 @@ export const defaultProducts = [
     "category": "tulum",
     "badge": "Önerilen",
     "image": "assets/product-wheel.png",
+    "images": ["assets/product-wheel.png"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "700g",
     "origin": "Erzincan",
     "stock": 14,
@@ -107,7 +126,8 @@ export const defaultProducts = [
     ],
     "featured": true,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 6,
@@ -118,6 +138,9 @@ export const defaultProducts = [
     "category": "bal",
     "badge": "Doğal",
     "image": "https://source.unsplash.com/900x700/?honey,jar",
+    "images": ["https://source.unsplash.com/900x700/?honey,jar"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "450g",
     "origin": "Yöresel",
     "stock": 16,
@@ -129,7 +152,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 7,
@@ -140,6 +164,9 @@ export const defaultProducts = [
     "category": "kasar",
     "badge": "Kahvaltılık",
     "image": "https://source.unsplash.com/900x700/?kashar,cheese",
+    "images": ["https://source.unsplash.com/900x700/?kashar,cheese"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Yöresel",
     "stock": 21,
@@ -151,7 +178,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 8,
@@ -162,6 +190,9 @@ export const defaultProducts = [
     "category": "kasar",
     "badge": "Yöresel",
     "image": "https://source.unsplash.com/900x700/?cheese,wheel",
+    "images": ["https://source.unsplash.com/900x700/?cheese,wheel"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Yöresel",
     "stock": 9,
@@ -173,7 +204,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 9,
@@ -184,6 +216,9 @@ export const defaultProducts = [
     "category": "kasar",
     "badge": "Gurme",
     "image": "https://source.unsplash.com/900x700/?cheese,dairy",
+    "images": ["https://source.unsplash.com/900x700/?cheese,dairy"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Yöresel",
     "stock": 13,
@@ -195,7 +230,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 10,
@@ -206,6 +242,9 @@ export const defaultProducts = [
     "category": "kasar",
     "badge": "Tostluk",
     "image": "https://source.unsplash.com/900x700/?toast,cheese",
+    "images": ["https://source.unsplash.com/900x700/?toast,cheese"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Yöresel",
     "stock": 30,
@@ -217,7 +256,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 11,
@@ -228,6 +268,9 @@ export const defaultProducts = [
     "category": "tereyagi",
     "badge": "Yemeklik",
     "image": "https://source.unsplash.com/900x700/?butter",
+    "images": ["https://source.unsplash.com/900x700/?butter"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Yöresel",
     "stock": 19,
@@ -239,7 +282,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 12,
@@ -250,6 +294,9 @@ export const defaultProducts = [
     "category": "tereyagi",
     "badge": "Geleneksel",
     "image": "https://source.unsplash.com/900x700/?butter,dairy",
+    "images": ["https://source.unsplash.com/900x700/?butter,dairy"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "800g",
     "origin": "Yöresel",
     "stock": 12,
@@ -261,7 +308,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 13,
@@ -272,6 +320,9 @@ export const defaultProducts = [
     "category": "salamura",
     "badge": "Salamura",
     "image": "https://source.unsplash.com/900x700/?white,cheese",
+    "images": ["https://source.unsplash.com/900x700/?white,cheese"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "650g",
     "origin": "Erzincan",
     "stock": 20,
@@ -283,7 +334,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 14,
@@ -294,6 +346,9 @@ export const defaultProducts = [
     "category": "diger-peynir",
     "badge": "Yöresel",
     "image": "https://source.unsplash.com/900x700/?blue,cheese",
+    "images": ["https://source.unsplash.com/900x700/?blue,cheese"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Erzurum",
     "stock": 7,
@@ -305,7 +360,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 15,
@@ -316,6 +372,9 @@ export const defaultProducts = [
     "category": "diger-peynir",
     "badge": "Kahvaltılık",
     "image": "https://source.unsplash.com/900x700/?string,cheese",
+    "images": ["https://source.unsplash.com/900x700/?string,cheese"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Yöresel",
     "stock": 22,
@@ -327,7 +386,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 16,
@@ -338,6 +398,9 @@ export const defaultProducts = [
     "category": "diger-peynir",
     "badge": "Taze",
     "image": "https://source.unsplash.com/900x700/?mozzarella,cheese",
+    "images": ["https://source.unsplash.com/900x700/?mozzarella,cheese"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Yöresel",
     "stock": 18,
@@ -349,7 +412,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 17,
@@ -360,6 +424,9 @@ export const defaultProducts = [
     "category": "diger-peynir",
     "badge": "Özel",
     "image": "https://source.unsplash.com/900x700/?braided,cheese",
+    "images": ["https://source.unsplash.com/900x700/?braided,cheese"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Yöresel",
     "stock": 16,
@@ -371,7 +438,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 18,
@@ -382,6 +450,9 @@ export const defaultProducts = [
     "category": "diger-peynir",
     "badge": "Aromalı",
     "image": "https://source.unsplash.com/900x700/?herb,cheese",
+    "images": ["https://source.unsplash.com/900x700/?herb,cheese"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Van",
     "stock": 10,
@@ -393,7 +464,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 19,
@@ -404,6 +476,9 @@ export const defaultProducts = [
     "category": "diger-peynir",
     "badge": "Yoğun",
     "image": "https://source.unsplash.com/900x700/?feta,cheese",
+    "images": ["https://source.unsplash.com/900x700/?feta,cheese"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Ezine",
     "stock": 14,
@@ -415,7 +490,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 20,
@@ -426,6 +502,9 @@ export const defaultProducts = [
     "category": "diger-peynir",
     "badge": "Klasik",
     "image": "https://source.unsplash.com/900x700/?cheese,block",
+    "images": ["https://source.unsplash.com/900x700/?cheese,block"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Ezine",
     "stock": 17,
@@ -437,7 +516,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 21,
@@ -448,6 +528,9 @@ export const defaultProducts = [
     "category": "pekmez",
     "badge": "Doğal",
     "image": "https://source.unsplash.com/900x700/?molasses,mulberry",
+    "images": ["https://source.unsplash.com/900x700/?molasses,mulberry"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "700g",
     "origin": "Erzincan",
     "stock": 15,
@@ -459,7 +542,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 22,
@@ -470,6 +554,9 @@ export const defaultProducts = [
     "category": "pekmez",
     "badge": "Yoğun",
     "image": "https://source.unsplash.com/900x700/?mulberry,syrup",
+    "images": ["https://source.unsplash.com/900x700/?mulberry,syrup"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "700g",
     "origin": "Erzincan",
     "stock": 11,
@@ -481,7 +568,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 23,
@@ -492,6 +580,9 @@ export const defaultProducts = [
     "category": "fasulye",
     "badge": "Yöresel",
     "image": "https://source.unsplash.com/900x700/?white,beans",
+    "images": ["https://source.unsplash.com/900x700/?white,beans"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "1000g",
     "origin": "Erzincan",
     "stock": 28,
@@ -503,7 +594,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 24,
@@ -514,6 +606,9 @@ export const defaultProducts = [
     "category": "fasulye",
     "badge": "Seçili",
     "image": "https://source.unsplash.com/900x700/?beans",
+    "images": ["https://source.unsplash.com/900x700/?beans"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "1000g",
     "origin": "Erzincan",
     "stock": 24,
@@ -525,7 +620,8 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   },
   {
     "id": 25,
@@ -536,6 +632,9 @@ export const defaultProducts = [
     "category": "kuru-meyve",
     "badge": "Doğal",
     "image": "https://source.unsplash.com/900x700/?dried,apricots",
+    "images": ["https://source.unsplash.com/900x700/?dried,apricots"],
+    "imageFit": "cover",
+    "imagePosition": "center center",
     "weight": "500g",
     "origin": "Erzincan",
     "stock": 19,
@@ -547,6 +646,7 @@ export const defaultProducts = [
     ],
     "featured": false,
     "bestSeller": false,
-    "active": true
+    "active": true,
+    "campaignActive": false
   }
 ];

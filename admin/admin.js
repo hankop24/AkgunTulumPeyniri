@@ -22,6 +22,14 @@ const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 const uid = (prefix) => `${prefix}-${Date.now()}-${Math.floor(Math.random() * 9000 + 1000)}`;
 const orderItems = (list = []) => [...list].sort((a, b) => Number(a.order || 999) - Number(b.order || 999));
 const imageSrc = (image) => !image ? "../assets/product-akgun.png" : image.startsWith("http") || image.startsWith("data:") ? image : `../${image}`;
+const productImages = (product = {}) => {
+  const list = Array.isArray(product.images) ? product.images : [];
+  const legacy = product.image ? [product.image] : [];
+  const merged = [...list, ...legacy].map((item) => String(item || "").trim()).filter(Boolean);
+  return [...new Set(merged)].length ? [...new Set(merged)] : ["assets/product-akgun.png"];
+};
+const mainProductImage = (product = {}) => productImages(product)[0] || "assets/product-akgun.png";
+const slugifyCategory = (value = "") => normalizeText(value).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || `kategori-${Date.now()}`;
 
 function toast(message) {
   const el = $("#toast");
@@ -52,6 +60,7 @@ function switchView(viewName) {
   refreshHeader();
   if (viewName === "products") renderProductsTable();
   if (viewName === "sections") renderSectionEditor();
+  if (viewName === "categories") renderCategoryManager();
 }
 
 function renderDashboard() {
@@ -81,6 +90,7 @@ function productMatchesFilters(product) {
   if (status === "active" && product.active === false) return false;
   if (status === "passive" && product.active !== false) return false;
   if (status === "featured" && !product.featured) return false;
+  if (status === "bestSeller" && !product.bestSeller) return false;
   if (status === "campaign" && !product.campaignActive) return false;
   if (status === "low-stock" && Number(product.stock) > Number(settings.lowStockLimit || 10)) return false;
   return true;
@@ -92,13 +102,14 @@ function renderProductsTable() {
     const low = Number(product.stock) <= Number(settings.lowStockLimit || 10);
     return `
       <div class="table-row">
-        <div class="table-img"><img src="${imageSrc(product.image)}" onerror="this.src='../assets/product-akgun.png'" alt="${product.title}" /></div>
+        <div class="table-img"><img src="${imageSrc(mainProductImage(product))}" style="object-fit:${product.imageFit || 'cover'};object-position:${product.imagePosition || 'center center'}" onerror="this.src='../assets/product-akgun.png'" alt="${product.title}" /></div>
         <div class="product-title"><strong>${product.title}</strong><span>${categoryName(product.category)} · ${product.weight || "Gramaj yok"}</span></div>
         <div>${money(product.price)}</div>
         <div>${product.stock} adet</div>
         <div class="status-list">
           ${product.active !== false ? `<span class="tag green">Aktif</span>` : `<span class="tag gray">Gizli</span>`}
           ${product.featured ? `<span class="tag">Öne çıkan</span>` : ""}
+          ${product.bestSeller ? `<span class="tag blue">Çok satan</span>` : ""}
           ${product.campaignActive ? `<span class="tag orange">Kampanya</span>` : ""}
           ${low ? `<span class="tag orange">Az stok</span>` : ""}
         </div>
@@ -144,9 +155,15 @@ function openProductEditor(productId = null) {
 }
 
 function fillProductEditor() {
+  editingProduct.images = productImages(editingProduct);
+  editingProduct.image = mainProductImage(editingProduct);
+  editingProduct.imageFit = editingProduct.imageFit || "cover";
+  editingProduct.imagePosition = editingProduct.imagePosition || "center center";
+
   $("#editorTitleInput").value = editingProduct.title || "";
   $("#editorDesc").value = editingProduct.desc || "";
   $("#editorCategory").innerHTML = categoryOptions(editingProduct.category);
+  $("#editorCategory").value = editingProduct.category || categories()[0]?.key || "tulum";
   $("#editorWeight").value = editingProduct.weight || "";
   $("#editorOrigin").value = editingProduct.origin || "";
   $("#editorOrder").value = editingProduct.order || products.length + 1;
@@ -154,17 +171,18 @@ function fillProductEditor() {
   $("#editorPrice").value = editingProduct.price || 0;
   $("#editorOldPrice").value = editingProduct.oldPrice || 0;
   $("#editorStock").value = editingProduct.stock || 0;
-  $("#editorRating").value = editingProduct.rating || 4.5;
   $("#editorBadge").value = editingProduct.badge || "";
   $("#editorActive").checked = editingProduct.active !== false;
   $("#editorFeatured").checked = Boolean(editingProduct.featured);
   $("#editorBestSeller").checked = Boolean(editingProduct.bestSeller);
   $("#editorCampaign").checked = Boolean(editingProduct.campaignActive);
-  $("#editorImage").value = editingProduct.image || "";
+  $("#editorImageUrl").value = "";
+  $("#editorImageFit").value = editingProduct.imageFit || "cover";
+  $("#editorImagePosition").value = editingProduct.imagePosition || "center center";
   renderProductPreview();
 }
-
 function collectEditorProduct() {
+  const images = productImages(editingProduct);
   return {
     ...editingProduct,
     title: $("#editorTitleInput").value.trim(),
@@ -177,21 +195,65 @@ function collectEditorProduct() {
     price: Number($("#editorPrice").value || 0),
     oldPrice: Number($("#editorOldPrice").value || 0),
     stock: Number($("#editorStock").value || 0),
-    rating: Number($("#editorRating").value || 4.5),
     badge: $("#editorBadge").value.trim(),
     active: $("#editorActive").checked,
     featured: $("#editorFeatured").checked,
     bestSeller: $("#editorBestSeller").checked,
     campaignActive: $("#editorCampaign").checked,
-    image: $("#editorImage").value.trim() || "assets/product-akgun.png"
+    imageFit: $("#editorImageFit").value,
+    imagePosition: $("#editorImagePosition").value,
+    image: images[0] || "assets/product-akgun.png",
+    images
   };
 }
-
 function renderProductPreview() {
-  const image = $("#editorImage").value || editingProduct?.image || "";
-  $("#productImagePreview").innerHTML = image ? `<img src="${imageSrc(image)}" onerror="this.parentElement.textContent='Görsel yüklenemedi'" alt="Ürün görseli" />` : "Görsel yok";
+  const images = productImages(editingProduct);
+  const fit = $("#editorImageFit")?.value || editingProduct?.imageFit || "cover";
+  const position = $("#editorImagePosition")?.value || editingProduct?.imagePosition || "center center";
+  const main = images[0];
+  $("#productImagePreview").innerHTML = main
+    ? `<img src="${imageSrc(main)}" style="object-fit:${fit};object-position:${position}" onerror="this.parentElement.textContent='Görsel yüklenemedi'" alt="Ürün görseli" />`
+    : "Görsel yok";
+
+  const gallery = $("#productGalleryPreview");
+  if (!gallery) return;
+  gallery.innerHTML = images.map((image, index) => `
+    <div class="gallery-item ${index === 0 ? "cover" : ""}">
+      <img src="${imageSrc(image)}" style="object-fit:${fit};object-position:${position}" onerror="this.src='../assets/product-akgun.png'" alt="Ürün görseli ${index + 1}" />
+      <div class="gallery-item-actions">
+        <button type="button" data-cover-image="${index}" ${index === 0 ? "disabled" : ""}>Kapak yap</button>
+        <button type="button" data-remove-image="${index}">Sil</button>
+      </div>
+    </div>
+  `).join("") || `<div class="empty-state">Henüz görsel eklenmedi.</div>`;
+
+  $$('[data-cover-image]').forEach((button) => button.addEventListener("click", () => setCoverImage(Number(button.dataset.coverImage))));
+  $$('[data-remove-image]').forEach((button) => button.addEventListener("click", () => removeProductImage(Number(button.dataset.removeImage))));
 }
 
+function addProductImage(url) {
+  const clean = String(url || "").trim();
+  if (!clean) return;
+  editingProduct.images = [...new Set([...productImages(editingProduct), clean])];
+  editingProduct.image = editingProduct.images[0];
+  renderProductPreview();
+}
+
+function setCoverImage(index) {
+  const images = productImages(editingProduct);
+  if (!images[index]) return;
+  const [selected] = images.splice(index, 1);
+  editingProduct.images = [selected, ...images];
+  editingProduct.image = selected;
+  renderProductPreview();
+}
+
+function removeProductImage(index) {
+  const images = productImages(editingProduct).filter((_, imageIndex) => imageIndex !== index);
+  editingProduct.images = images.length ? images : [];
+  editingProduct.image = images[0] || "";
+  renderProductPreview();
+}
 async function saveEditorProduct() {
   const product = collectEditorProduct();
   if (!product.title) return toast("Ürün adı zorunlu.");
@@ -246,6 +308,49 @@ async function handleImageFile(input, folder, onReady) {
     toast("Görsel önizleme olarak eklendi.");
   });
 }
+
+async function handleProductImageFiles(input) {
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
+
+  for (const file of files) {
+    if (isFirebaseConfigured()) {
+      try {
+        toast(`${file.name} yükleniyor...`);
+        const url = await uploadImageFile(file, "product-images");
+        addProductImage(url);
+        continue;
+      } catch (error) {
+        console.warn("Görsel Storage'a yüklenemedi, veri olarak okunacak.", error);
+      }
+    }
+
+    await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => { addProductImage(reader.result); resolve(); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  input.value = "";
+  toast("Görseller galeriye eklendi.");
+}
+
+async function quickAddCategory() {
+  const label = prompt("Yeni kategori adını yaz:");
+  if (!label) return;
+  const baseKey = slugifyCategory(label);
+  let key = baseKey;
+  let counter = 2;
+  while ((content.categories || []).some((item) => item.key === key)) key = `${baseKey}-${counter++}`;
+  const category = { id: uid("cat"), key, label: label.trim(), active: true, order: (content.categories || []).length + 1 };
+  content = normalizeContent({ ...content, categories: [...(content.categories || []), category] });
+  content = await saveContent(content);
+  fillProductFilters();
+  $("#editorCategory").value = key;
+  toast("Yeni kategori eklendi.");
+}
+
 
 function fillSettingsForm() {
   $("#settingBrandName").value = settings.brandName || "";
@@ -459,6 +564,38 @@ async function removeListItem(payload) {
   toast("Satır silindi.");
 }
 
+function renderCategoryManager() {
+  const root = $("#categoryManager");
+  if (!root) return;
+  root.innerHTML = renderListItems("categories");
+  root.querySelectorAll('[data-remove-item]').forEach((button) => button.addEventListener("click", () => removeCategoryFromManager(button.dataset.removeItem)));
+}
+
+async function saveCategoryManager() {
+  content = normalizeContent({ ...content, categories: collectList("categories") });
+  content = await saveContent(content);
+  fillProductFilters();
+  renderCategoryManager();
+  toast("Kategoriler kaydedildi.");
+}
+
+async function addCategoryFromManager() {
+  content = normalizeContent({ ...content, categories: [...(content.categories || []), emptyListItem("categories")] });
+  content = await saveContent(content);
+  fillProductFilters();
+  renderCategoryManager();
+  toast("Yeni kategori eklendi.");
+}
+
+async function removeCategoryFromManager(payload) {
+  const [, id] = payload.split(":");
+  content = normalizeContent({ ...content, categories: (content.categories || []).filter((item) => String(item.id) !== String(id)) });
+  content = await saveContent(content);
+  fillProductFilters();
+  renderCategoryManager();
+  toast("Kategori silindi.");
+}
+
 async function exportData() {
   const data = { products, settings, content, exportedAt: new Date().toISOString() };
   const json = JSON.stringify(data, null, 2);
@@ -580,11 +717,22 @@ function bindEvents() {
   $("#productSearch").addEventListener("input", renderProductsTable);
   $("#productCategoryFilter").addEventListener("change", renderProductsTable);
   $("#productStatusFilter").addEventListener("change", renderProductsTable);
-  $("#editorImage").addEventListener("input", renderProductPreview);
-  $("#editorImageFile").addEventListener("change", () => handleImageFile($("#editorImageFile"), "product-images", (imageUrl) => {
-    $("#editorImage").value = imageUrl;
+  $("#addImageUrlButton").addEventListener("click", () => {
+    addProductImage($("#editorImageUrl").value);
+    $("#editorImageUrl").value = "";
+  });
+  $("#clearImagesButton").addEventListener("click", () => {
+    if (!confirm("Ürün galerisi temizlensin mi?")) return;
+    editingProduct.images = [];
+    editingProduct.image = "";
     renderProductPreview();
-  }));
+  });
+  $("#editorImageFit").addEventListener("change", renderProductPreview);
+  $("#editorImagePosition").addEventListener("change", renderProductPreview);
+  $("#editorImageFile").addEventListener("change", () => handleProductImageFiles($("#editorImageFile")));
+  $("#quickAddCategoryButton").addEventListener("click", quickAddCategory);
+  $("#saveCategoriesButton").addEventListener("click", saveCategoryManager);
+  $("#addCategoryManagerButton").addEventListener("click", addCategoryFromManager);
   $("#settingsForm").addEventListener("submit", saveSettingsForm);
   $$("#sectionMenu button").forEach((button) => button.addEventListener("click", () => { currentSection = button.dataset.section; renderSectionEditor(); }));
   $("#exportDataButton").addEventListener("click", exportData);
@@ -612,6 +760,7 @@ function renderAll() {
   renderDashboard();
   renderProductsTable();
   renderSectionEditor();
+  renderCategoryManager();
   renderDataPreview();
 }
 
