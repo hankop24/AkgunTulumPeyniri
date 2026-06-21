@@ -2,7 +2,7 @@ import { categoryLabels as fallbackCategoryLabels } from "../config/app-config.j
 import { getProducts } from "../services/catalog-service.js";
 import { getSiteSettings } from "../services/site-settings-service.js";
 import { getContent } from "../services/content-service.js";
-import { money, normalizeText, slugPhone } from "../utils/format.js";
+import { money, normalizeText, slugPhone, phoneHref } from "../utils/format.js";
 
 let products = [];
 let settings = {};
@@ -47,8 +47,11 @@ function applySiteSettings() {
 
   const phone = slugPhone(settings.whatsappNumber || "905000000000");
   const message = encodeURIComponent(settings.whatsappDefaultMessage || "Merhaba, bilgi almak istiyorum.");
-  qsa("[data-whatsapp-link]").forEach((link) => { link.href = `https://wa.me/${phone}?text=${message}`; });
-  qsa("[data-phone-link]").forEach((link) => { link.href = `tel:${settings.phoneNumber || settings.whatsappNumber || "+905000000000"}`; });
+  qsa("[data-whatsapp-link]").forEach((link) => {
+    link.href = phone ? `https://wa.me/${phone}?text=${message}` : "#";
+  });
+  const tel = phoneHref(settings.phoneNumber || settings.whatsappNumber || "+905000000000");
+  qsa("[data-phone-link]").forEach((link) => { link.href = tel ? `tel:${tel}` : "#"; });
 }
 
 function renderNavigation() {
@@ -398,12 +401,37 @@ function closeProductModal() {
 
 function buildWhatsAppMessage() {
   if (!cart.length) return encodeURIComponent(settings.whatsappDefaultMessage || "Merhaba, ürünler hakkında bilgi almak istiyorum.");
-  const lines = cart.map((item) => `- ${item.title} (${item.weight}) x ${item.qty}: ${money(item.price * item.qty)}`);
-  return encodeURIComponent(`Merhaba, sipariş vermek istiyorum.\n\nÜrünler:\n${lines.join("\n")}\n\nToplam: ${money(cartTotalValue())}`);
+
+  const lines = cart.flatMap((item, index) => ([
+    `${index + 1}) ${item.title}${item.weight ? ` - ${item.weight}` : ""}`,
+    `   Adet: ${item.qty}`,
+    `   Birim fiyat: ${money(item.price)}`,
+    `   Ara toplam: ${money(item.price * item.qty)}`
+  ]));
+
+  const totalQuantity = cart.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+
+  return encodeURIComponent([
+    "Merhaba, Akgün Erzincan Tulum Peyniri sitesinden sipariş vermek istiyorum.",
+    "",
+    "Sipariş detayları:",
+    ...lines,
+    "",
+    `Toplam ürün adedi: ${totalQuantity}`,
+    `Genel toplam: ${money(cartTotalValue())}`,
+    "",
+    "Ad Soyad:",
+    "Teslimat adresi:",
+    "Not:"
+  ].join("\n"));
 }
 
 function openCheckout() {
   const phone = slugPhone(settings.whatsappNumber || "905000000000");
+  if (!phone) {
+    alert("WhatsApp numarası tanımlı değil. Lütfen admin panelinden WhatsApp numarasını ekleyin.");
+    return;
+  }
   window.open(`https://wa.me/${phone}?text=${buildWhatsAppMessage()}`, "_blank");
 }
 

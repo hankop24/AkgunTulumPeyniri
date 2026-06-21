@@ -1353,3 +1353,61 @@ h2 {
   top: 14px;
   right: 14px;
 }
+
+
+/* Sabit WhatsApp butonu: numara güncellense bile ikonun büyüyüp sayfayı kaplamasını engeller. */
+.whatsapp-fixed {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: auto;
+  max-width: 190px;
+  height: 56px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #25d366;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 18px 42px rgba(37, 211, 102, 0.34);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.whatsapp-fixed:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 48px rgba(37, 211, 102, 0.44);
+}
+
+.whatsapp-fixed svg {
+  display: block;
+  width: 26px;
+  min-width: 26px;
+  height: 26px;
+  fill: currentColor;
+}
+
+.whatsapp-fixed span {
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .whatsapp-fixed {
+    right: 16px;
+    bottom: 78px;
+    width: 56px;
+    height: 56px;
+    max-width: 56px;
+    padding: 0;
+  }
+
+  .whatsapp-fixed span {
+    display: none;
+  }
+}

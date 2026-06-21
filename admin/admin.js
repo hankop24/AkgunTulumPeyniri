@@ -2,7 +2,7 @@ import { getProducts, saveProduct, deleteProduct, saveProducts, createEmptyProdu
 import { getSiteSettings, saveSiteSettings } from "../src/services/site-settings-service.js";
 import { getContent, saveContent, normalizeContent } from "../src/services/content-service.js";
 import { getBackendStatus, seedFirebase, isFirebaseConfigured, signInAdmin, signOutAdmin, onAdminAuthStateChanged, uploadImageFile } from "../src/services/backend-service.js";
-import { money, normalizeText, parseTags } from "../src/utils/format.js";
+import { money, normalizeText, parseTags, slugPhone } from "../src/utils/format.js";
 import { defaultProducts } from "../src/data/default-products.js";
 import { defaultSiteSettings } from "../src/data/default-site-settings.js";
 import { defaultContent } from "../src/data/default-content.js";
@@ -437,7 +437,7 @@ async function saveSettingsForm(event) {
     ...settings,
     brandName: $("#settingBrandName").value,
     pageTitle: $("#settingPageTitle").value,
-    whatsappNumber: $("#settingWhatsappNumber").value,
+    whatsappNumber: slugPhone($("#settingWhatsappNumber").value),
     phoneNumber: $("#settingPhoneNumber").value,
     freeShippingTarget: Number($("#settingFreeShippingTarget").value || 0),
     lowStockLimit: Number($("#settingLowStockLimit").value || 10),
