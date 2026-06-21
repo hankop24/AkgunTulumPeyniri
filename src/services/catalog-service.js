@@ -40,18 +40,36 @@ export async function saveProducts(products) {
 
 export async function saveProduct(product) {
   const normalized = normalizeProduct(product);
-  const products = localProducts();
+
+  // Kritik düzeltme:
+  // Firebase koleksiyonu ilk başta boş olduğunda getProducts() varsayılan ürünleri döndürür.
+  // Yeni ürün eklerken bu varsayılan listeyi de Firebase'e yazarız. Böylece site sadece yeni ürünü
+  // gösterip diğer varsayılan ürünleri kaybetmez.
+  const products = await getProducts();
   const exists = products.some((item) => String(item.id) === String(normalized.id));
-  const next = exists ? products.map((item) => String(item.id) === String(normalized.id) ? normalized : item) : [normalized, ...products];
+  const next = exists
+    ? products.map((item) => String(item.id) === String(normalized.id) ? normalized : item)
+    : [normalized, ...products];
+
   localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(next));
-  if (isFirebaseConfigured()) await writeCollectionDoc(FIRESTORE_COLLECTIONS.products, normalized.id, normalized);
+
+  if (isFirebaseConfigured()) {
+    await Promise.all(next.map((item) => writeCollectionDoc(FIRESTORE_COLLECTIONS.products, item.id, item)));
+  }
+
   return normalized;
 }
 
 export async function deleteProduct(productId) {
-  const next = localProducts().filter((item) => String(item.id) !== String(productId));
+  const current = await getProducts();
+  const next = current.filter((item) => String(item.id) !== String(productId));
+
   localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(next));
-  if (isFirebaseConfigured()) await deleteCollectionDoc(FIRESTORE_COLLECTIONS.products, productId);
+
+  if (isFirebaseConfigured()) {
+    await deleteCollectionDoc(FIRESTORE_COLLECTIONS.products, productId);
+  }
+
   return next;
 }
 
