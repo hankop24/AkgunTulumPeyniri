@@ -161,3 +161,118 @@ label { display: grid; gap: 8px; color: #334155; font-weight: 760; font-size: 14
   .table-row > div:nth-child(n+3) { grid-column: 2; }
   .row-actions { justify-content: flex-start; }
 }
+
+/* Firebase giriş ekranı */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(95, 108, 255, 0.18), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(20, 184, 166, 0.18), transparent 30%),
+    #0f172a;
+}
+
+.login-screen[hidden] { display: none; }
+
+.login-card {
+  width: min(460px, 100%);
+  padding: 34px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
+  display: grid;
+  gap: 16px;
+}
+
+.login-card img {
+  width: 170px;
+  max-height: 80px;
+  object-fit: contain;
+  justify-self: start;
+}
+
+.login-kicker {
+  display: inline-flex;
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.login-card h1 {
+  margin: 0;
+  font-size: clamp(30px, 5vw, 44px);
+  line-height: 0.95;
+  color: #0f172a;
+}
+
+.login-card p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.login-card label {
+  display: grid;
+  gap: 8px;
+  color: #334155;
+  font-weight: 800;
+}
+
+.login-card input {
+  width: 100%;
+  border: 1px solid #dbe3ef;
+  border-radius: 16px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  color: #0f172a;
+  outline: none;
+}
+
+.login-card input:focus {
+  border-color: #6478ff;
+  box-shadow: 0 0 0 4px rgba(100, 120, 255, 0.14);
+}
+
+.login-card small {
+  min-height: 20px;
+  color: #b42318;
+  font-weight: 700;
+}
+
+.admin-shell.is-locked {
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.admin-user {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  display: grid;
+  gap: 5px;
+}
+
+.admin-user span {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-user strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}

@@ -1,7 +1,7 @@
 import { getProducts, saveProduct, deleteProduct, saveProducts, createEmptyProduct } from "../src/services/catalog-service.js";
 import { getSiteSettings, saveSiteSettings } from "../src/services/site-settings-service.js";
 import { getContent, saveContent, normalizeContent } from "../src/services/content-service.js";
-import { getBackendStatus, seedFirebase } from "../src/services/backend-service.js";
+import { getBackendStatus, seedFirebase, isFirebaseConfigured, signInAdmin, signOutAdmin, onAdminAuthStateChanged, uploadImageFile } from "../src/services/backend-service.js";
 import { money, normalizeText, parseTags } from "../src/utils/format.js";
 import { defaultProducts } from "../src/data/default-products.js";
 import { defaultSiteSettings } from "../src/data/default-site-settings.js";
@@ -14,6 +14,8 @@ let currentView = "dashboard";
 let currentSection = "announcement";
 let editingProduct = null;
 let isCreatingProduct = false;
+let adminEventsBound = false;
+let authUnsubscribe = null;
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -218,8 +220,31 @@ function readImageFile(input, callback) {
   const file = input.files?.[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = () => callback(reader.result);
+  reader.onload = () => callback(reader.result, file);
   reader.readAsDataURL(file);
+}
+
+async function handleImageFile(input, folder, onReady) {
+  const file = input.files?.[0];
+  if (!file) return;
+
+  if (isFirebaseConfigured()) {
+    try {
+      toast("Görsel Firebase Storage'a yükleniyor...");
+      const url = await uploadImageFile(file, folder);
+      onReady(url);
+      toast("Görsel yüklendi.");
+      return;
+    } catch (error) {
+      console.warn("Görsel Storage'a yüklenemedi, veri olarak okunacak.", error);
+      toast(error.message || "Görsel yüklenemedi, yerel önizleme kullanılacak.");
+    }
+  }
+
+  readImageFile(input, (dataUrl) => {
+    onReady(dataUrl);
+    toast("Görsel önizleme olarak eklendi.");
+  });
 }
 
 function fillSettingsForm() {
@@ -361,12 +386,12 @@ function bindSectionEditorEvents() {
   $$('[data-save-list]').forEach((button) => button.addEventListener("click", () => saveList(button.dataset.saveList)));
   $$('[data-add-list]').forEach((button) => button.addEventListener("click", () => addListItem(button.dataset.addList)));
   $$('[data-remove-item]').forEach((button) => button.addEventListener("click", () => removeListItem(button.dataset.removeItem)));
-  $$('[data-setting-file]').forEach((input) => input.addEventListener("change", () => readImageFile(input, async (dataUrl) => {
+  $$('[data-setting-file]').forEach((input) => input.addEventListener("change", () => handleImageFile(input, "site-images", async (imageUrl) => {
     const key = input.dataset.settingFile;
     const target = $(`[data-setting-field="${key}"]`);
-    if (target) target.value = dataUrl;
-    settings = await saveSiteSettings({ ...settings, [key]: dataUrl });
-    toast("Görsel kaydedildi.");
+    if (target) target.value = imageUrl;
+    settings = await saveSiteSettings({ ...settings, [key]: imageUrl });
+    toast("Bölüm görseli kaydedildi.");
   })));
 }
 
@@ -494,7 +519,57 @@ async function saveEverything() {
   toast("Tüm veriler kaydedildi.");
 }
 
+
+function setAdminLocked(isLocked) {
+  const loginScreen = $("#loginScreen");
+  const adminShell = $("#adminShell");
+  if (loginScreen) loginScreen.hidden = !isLocked;
+  if (adminShell) adminShell.classList.toggle("is-locked", isLocked);
+}
+
+function setAdminInfo(user) {
+  const userEl = $("#adminUserEmail");
+  if (userEl) userEl.textContent = user?.email || "Giriş yapılmadı";
+}
+
+function bindAuthEvents() {
+  $("#loginForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const email = $("#loginEmail").value.trim();
+    const password = $("#loginPassword").value;
+    const message = $("#loginMessage");
+    if (message) message.textContent = "Giriş yapılıyor...";
+
+    try {
+      await signInAdmin(email, password);
+      if (message) message.textContent = "";
+      toast("Admin girişi başarılı.");
+    } catch (error) {
+      console.warn("Admin girişi başarısız.", error);
+      if (message) message.textContent = "E-posta veya şifre hatalı olabilir.";
+    }
+  });
+
+  $("#logoutButton")?.addEventListener("click", async () => {
+    try {
+      await signOutAdmin();
+      toast("Çıkış yapıldı.");
+    } catch (error) {
+      toast("Çıkış yapılamadı.");
+    }
+  });
+}
+
+async function bootAdminPanel() {
+  await loadData();
+  renderAll();
+  bindEvents();
+  switchView("dashboard");
+}
+
 function bindEvents() {
+  if (adminEventsBound) return;
+  adminEventsBound = true;
   $$("#sideNav button").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
   $$('[data-jump]').forEach((button) => button.addEventListener("click", () => switchView(button.dataset.jump)));
   $$('[data-open-product-new]').forEach((button) => button.addEventListener("click", () => openProductEditor()));
@@ -506,7 +581,10 @@ function bindEvents() {
   $("#productCategoryFilter").addEventListener("change", renderProductsTable);
   $("#productStatusFilter").addEventListener("change", renderProductsTable);
   $("#editorImage").addEventListener("input", renderProductPreview);
-  $("#editorImageFile").addEventListener("change", () => readImageFile($("#editorImageFile"), (dataUrl) => { $("#editorImage").value = dataUrl; renderProductPreview(); }));
+  $("#editorImageFile").addEventListener("change", () => handleImageFile($("#editorImageFile"), "product-images", (imageUrl) => {
+    $("#editorImage").value = imageUrl;
+    renderProductPreview();
+  }));
   $("#settingsForm").addEventListener("submit", saveSettingsForm);
   $$("#sectionMenu button").forEach((button) => button.addEventListener("click", () => { currentSection = button.dataset.section; renderSectionEditor(); }));
   $("#exportDataButton").addEventListener("click", exportData);
@@ -538,11 +616,26 @@ function renderAll() {
 }
 
 async function init() {
+  bindAuthEvents();
   await showBackendStatus();
-  await loadData();
-  renderAll();
-  bindEvents();
-  switchView("dashboard");
+
+  if (!isFirebaseConfigured()) {
+    setAdminLocked(false);
+    await bootAdminPanel();
+    return;
+  }
+
+  setAdminLocked(true);
+  authUnsubscribe = await onAdminAuthStateChanged(async (user) => {
+    setAdminInfo(user);
+    if (!user) {
+      setAdminLocked(true);
+      return;
+    }
+
+    setAdminLocked(false);
+    await bootAdminPanel();
+  });
 }
 
 init();

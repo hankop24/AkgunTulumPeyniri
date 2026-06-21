@@ -10,7 +10,20 @@
     <link rel="stylesheet" href="admin.css" />
   </head>
   <body>
-    <div class="admin-shell">
+    <section class="login-screen" id="loginScreen" hidden>
+      <form class="login-card" id="loginForm">
+        <img src="../assets/logo-akgun.png" alt="Akgün" />
+        <span class="login-kicker">Güvenli Yönetim Paneli</span>
+        <h1>Admin girişi</h1>
+        <p>Ürün, fiyat, görsel ve sayfa içeriklerini yönetmek için Firebase admin hesabıyla giriş yap.</p>
+        <label>E-posta<input id="loginEmail" type="email" autocomplete="email" required placeholder="admin@..." /></label>
+        <label>Şifre<input id="loginPassword" type="password" autocomplete="current-password" required placeholder="••••••••" /></label>
+        <button class="btn primary" type="submit">Giriş Yap</button>
+        <small id="loginMessage"></small>
+      </form>
+    </section>
+
+    <div class="admin-shell" id="adminShell">
       <aside class="sidebar">
         <a class="brand-card" href="../index.html" target="_blank" aria-label="Siteyi aç">
           <img src="../assets/logo-akgun.png" alt="Akgün" />
@@ -31,6 +44,8 @@
           <span id="backendDetail">Veri sistemi hazırlanıyor.</span>
         </div>
 
+        <div class="admin-user"><span>Aktif kullanıcı</span><strong id="adminUserEmail">Kontrol ediliyor</strong></div>
+
         <a class="site-link" href="../index.html" target="_blank">Canlı Siteyi Aç</a>
       </aside>
 
@@ -43,6 +58,7 @@
           </div>
           <div class="topbar-actions">
             <button class="btn ghost" id="refreshButton">Yenile</button>
+            <button class="btn ghost" id="logoutButton">Çıkış</button>
             <button class="btn primary" id="saveEverythingButton">Tümünü Kaydet</button>
           </div>
         </header>
@@ -154,7 +170,7 @@
               <label class="file-drop">Bilgisayardan görsel seç
                 <input id="editorImageFile" type="file" accept="image/*" />
               </label>
-              <small>Dosya seçersen görsel veri olarak kaydedilir. Gerçek sunucuya yükleme için sonraki aşamada Firebase Storage bağlanabilir.</small>
+              <small>Dosya seçersen görsel Firebase Storage’a yüklenir ve ürün kaydına otomatik bağlantı olarak eklenir.</small>
             </section>
           </form>
         </section>
