@@ -35,7 +35,6 @@
           <button class="active" data-view="dashboard">Panel Özeti</button>
           <button data-view="products">Ürün Yönetimi</button>
           <button data-view="sections">Sayfa Bölümleri</button>
-          <button data-view="categories">Kategori Yönetimi</button>
           <button data-view="settings">Site Ayarları</button>
           <button data-view="data">Veri & Yayın</button>
         </nav>
@@ -105,7 +104,7 @@
 
           <div class="panel-card product-list-card">
             <div class="list-toolbar">
-              <input id="productSearch" type="search" placeholder="Ürün adı, açıklama, rozet ya da etiket ara..." />
+              <input id="productSearch" type="search" placeholder="Ürün adı, açıklama, kategori ya da etiket ara..." />
               <select id="productCategoryFilter"></select>
               <select id="productStatusFilter">
                 <option value="all">Tüm durumlar</option>
@@ -119,6 +118,18 @@
             </div>
             <div class="products-table" id="productsTable"></div>
           </div>
+
+          <details class="panel-card compact-category-card">
+            <summary>
+              <span>Ufak Kategori Yönetimi</span>
+              <small>Yeni ürün eklerken görünen kategori seçeneklerini hızlıca düzenle.</small>
+            </summary>
+            <div id="categoryManager"></div>
+            <div class="form-footer">
+              <button class="btn soft" id="addCategoryManagerButton" type="button">+ Yeni kategori ekle</button>
+              <button class="btn primary" id="saveCategoriesButton" type="button">Kategorileri Kaydet</button>
+            </div>
+          </details>
         </section>
 
         <section class="view" id="productEditorView" data-title="Ürün Detayı" data-desc="Ürünün bütün bilgilerini doldur ve kaydet. Kayıttan önce siteye eklenmez.">
@@ -140,7 +151,7 @@
               <label>Ürün adı<input id="editorTitleInput" required placeholder="Örn. Erzincan Tulum Peyniri" /></label>
               <label>Kısa açıklama<textarea id="editorDesc" rows="5" placeholder="Ürünün sitede görünen açıklaması"></textarea></label>
               <div class="form-grid two">
-                <label class="category-field">Kategori<select id="editorCategory"></select><button class="inline-add-button" type="button" id="quickAddCategoryButton">+ Yeni kategori ekle</button></label>
+                <label class="category-field">Kategori<select id="editorCategory"></select><small>Yeni kategori eklemek için listenin en altındaki “+ Yeni kategori ekle” seçeneğini seç.</small></label>
                 <label>Gramaj / Paket<input id="editorWeight" placeholder="500g / 1kg / Set" /></label>
                 <label>Menşei<input id="editorOrigin" placeholder="Erzincan" /></label>
                 <label>Liste sırası<input id="editorOrder" type="number" min="1" /><small>Bu sayı ürünlerin ekranda hangi öncelikle görüneceğini belirler. Küçük sayı daha önce görünür.</small></label>
@@ -155,24 +166,11 @@
                 <label>Eski fiyat<input id="editorOldPrice" type="number" min="0" /></label>
                 <label>Stok adedi<input id="editorStock" type="number" min="0" /></label>
               </div>
-              <label>Ürün rozeti
-                <input id="editorBadge" list="badgeOptions" placeholder="Yeni / Kampanya / Çok Satan / Premium" />
-                <datalist id="badgeOptions">
-                  <option value="Yeni"></option>
-                  <option value="Çok Satan"></option>
-                  <option value="Kampanya"></option>
-                  <option value="Premium"></option>
-                  <option value="Sınırlı Stok"></option>
-                  <option value="Özel Ürün"></option>
-                  <option value="Set"></option>
-                </datalist>
-                <small>İstersen listeden seç, istersen kendin yaz.</small>
-              </label>
               <div class="switch-stack separated-switches">
                 <label><input id="editorActive" type="checkbox" /> <span><strong>Sitede görünsün</strong><small>Kapalı olursa ürün canlı sitede listelenmez.</small></span></label>
                 <label><input id="editorFeatured" type="checkbox" /> <span><strong>Öne çıkanlarda göster</strong><small>Ürünü ana sayfadaki öne çıkanlar vitrini içine alır.</small></span></label>
                 <label><input id="editorBestSeller" type="checkbox" /> <span><strong>Çok satan olarak işaretle</strong><small>Ürün kartında/listesinde ayrı bir durum etiketi olarak kullanılır.</small></span></label>
-                <label><input id="editorCampaign" type="checkbox" /> <span><strong>Kampanya aktif</strong><small>Kampanya filtrelerinde görünür. Eski fiyatı ayrıca girmen önerilir.</small></span></label>
+                <label><input id="editorCampaign" type="checkbox" /> <span><strong>Kampanya aktif</strong><small>Açık olursa ürün kartının sağ alt köşesinde kırmızı “Kampanya” rozeti görünür. Eski fiyatı ayrıca girmen önerilir.</small></span></label>
               </div>
             </section>
 
@@ -189,24 +187,31 @@
               <label class="file-drop">Bilgisayardan görsel seç
                 <input id="editorImageFile" type="file" accept="image/*" multiple />
               </label>
-              <div class="form-grid two">
-                <label>Görsel kırpma / görünüm
-                  <select id="editorImageFit">
-                    <option value="cover">Alanı doldur / kırp</option>
-                    <option value="contain">Tamamı görünsün</option>
-                  </select>
-                </label>
-                <label>Görsel odak noktası
-                  <select id="editorImagePosition">
-                    <option value="center center">Orta</option>
-                    <option value="top center">Üst</option>
-                    <option value="bottom center">Alt</option>
-                    <option value="center left">Sol</option>
-                    <option value="center right">Sağ</option>
-                  </select>
-                </label>
+              <div class="selected-image-editor" id="selectedImageEditor">
+                <div class="selected-image-editor-head">
+                  <strong>Seçili görsel ayarı</strong>
+                  <span id="selectedImageLabel">Görsel seçilmedi</span>
+                </div>
+                <div class="form-grid two">
+                  <label>Bu görselin kırpma / görünümü
+                    <select id="editorSelectedImageFit">
+                      <option value="cover">Alanı doldur / kırp</option>
+                      <option value="contain">Tamamı görünsün</option>
+                    </select>
+                  </label>
+                  <label>Bu görselin odak noktası
+                    <select id="editorSelectedImagePosition">
+                      <option value="center center">Orta</option>
+                      <option value="top center">Üst</option>
+                      <option value="bottom center">Alt</option>
+                      <option value="center left">Sol</option>
+                      <option value="center right">Sağ</option>
+                    </select>
+                  </label>
+                </div>
+                <small>Her görsele ayrı kırpma/odak ayarı verebilirsin. Görsele tıkla, ayarını değiştir, sonra ürünü kaydet.</small>
               </div>
-              <small>Dosya seçersen görsel Firebase Storage’a yüklenir ve ürün kaydına otomatik bağlantı olarak eklenir.</small>
+              <small>Dosya seçersen görsel Firebase Storage’a yüklenir; görsel bağlantısı ve bu görsele ait görünüm ayarları ürün kaydıyla Firestore database’e eklenir.</small>
             </section>
           </form>
         </section>
@@ -227,14 +232,6 @@
             </aside>
 
             <div class="sections-editor" id="sectionsEditor"></div>
-          </div>
-        </section>
-
-        <section class="view" id="categoriesView" data-title="Kategori Yönetimi" data-desc="Ürün kategorilerini ekle, düzenle, gizle veya sıralamasını değiştir.">
-          <div class="panel-card">
-            <div class="block-title"><div><h2>Kategoriler</h2><p>Yeni ürün eklerken görünen kategori listesini buradan yönetirsin.</p></div><button class="btn primary" id="saveCategoriesButton">Kategorileri Kaydet</button></div>
-            <div id="categoryManager"></div>
-            <div class="form-footer"><button class="btn soft" id="addCategoryManagerButton">+ Yeni kategori ekle</button></div>
           </div>
         </section>
 

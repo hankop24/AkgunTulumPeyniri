@@ -1328,3 +1328,28 @@ h2 {
   .modal-thumbs { grid-template-columns: repeat(3, 1fr); }
   .modal-thumb { height: 64px; }
 }
+
+/* Ürün kartı rozet sadeleştirmesi */
+.campaign-badge {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 12px 28px rgba(220, 38, 38, 0.26);
+}
+.best-seller-badge {
+  top: 14px;
+  left: 14px;
+  background: rgba(23, 56, 43, 0.92);
+  color: #fff7e8;
+}
+.discount-badge {
+  top: 14px;
+  right: 14px;
+}

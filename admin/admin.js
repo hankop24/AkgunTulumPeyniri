@@ -14,6 +14,7 @@ let currentView = "dashboard";
 let currentSection = "announcement";
 let editingProduct = null;
 let isCreatingProduct = false;
+let selectedProductImageIndex = 0;
 let adminEventsBound = false;
 let authUnsubscribe = null;
 
@@ -21,14 +22,33 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 const uid = (prefix) => `${prefix}-${Date.now()}-${Math.floor(Math.random() * 9000 + 1000)}`;
 const orderItems = (list = []) => [...list].sort((a, b) => Number(a.order || 999) - Number(b.order || 999));
-const imageSrc = (image) => !image ? "../assets/product-akgun.png" : image.startsWith("http") || image.startsWith("data:") ? image : `../${image}`;
-const productImages = (product = {}) => {
-  const list = Array.isArray(product.images) ? product.images : [];
-  const legacy = product.image ? [product.image] : [];
-  const merged = [...list, ...legacy].map((item) => String(item || "").trim()).filter(Boolean);
-  return [...new Set(merged)].length ? [...new Set(merged)] : ["assets/product-akgun.png"];
+const imageSrc = (image) => {
+  const url = typeof image === "object" ? image?.url : image;
+  if (!url) return "../assets/product-akgun.png";
+  return String(url).startsWith("http") || String(url).startsWith("data:") ? String(url) : `../${url}`;
 };
-const mainProductImage = (product = {}) => productImages(product)[0] || "assets/product-akgun.png";
+const normalizeGalleryItem = (item, fallback = {}) => {
+  const url = typeof item === "object" ? item?.url || item?.src || item?.image : item;
+  return {
+    url: String(url || "").trim(),
+    fit: ["cover", "contain"].includes(item?.fit) ? item.fit : (fallback.fit || "cover"),
+    position: String(item?.position || fallback.position || "center center")
+  };
+};
+const productImages = (product = {}) => {
+  const fallback = { fit: product.imageFit || "cover", position: product.imagePosition || "center center" };
+  const raw = Array.isArray(product.images) ? product.images : [];
+  const merged = [...raw, product.image].map((item) => normalizeGalleryItem(item, fallback)).filter((item) => item.url);
+  const seen = new Set();
+  const unique = merged.filter((item) => {
+    if (seen.has(item.url)) return false;
+    seen.add(item.url);
+    return true;
+  });
+  return unique.length ? unique : [{ url: "assets/product-akgun.png", fit: "cover", position: "center center" }];
+};
+const mainProductImage = (product = {}) => productImages(product)[0]?.url || "assets/product-akgun.png";
+const imageStyle = (image = {}) => `object-fit:${image.fit || "cover"};object-position:${image.position || "center center"}`;
 const slugifyCategory = (value = "") => normalizeText(value).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || `kategori-${Date.now()}`;
 
 function toast(message) {
@@ -60,7 +80,6 @@ function switchView(viewName) {
   refreshHeader();
   if (viewName === "products") renderProductsTable();
   if (viewName === "sections") renderSectionEditor();
-  if (viewName === "categories") renderCategoryManager();
 }
 
 function renderDashboard() {
@@ -72,7 +91,8 @@ function renderDashboard() {
 }
 
 function categoryOptions(selected = "") {
-  return categories().map((cat) => `<option value="${cat.key}" ${cat.key === selected ? "selected" : ""}>${cat.label}</option>`).join("");
+  const options = categories().map((cat) => `<option value="${cat.key}" ${cat.key === selected ? "selected" : ""}>${cat.label}</option>`).join("");
+  return `${options}<option value="__add_category__">+ Yeni kategori ekle</option>`;
 }
 
 function fillProductFilters() {
@@ -84,7 +104,7 @@ function productMatchesFilters(product) {
   const term = normalizeText($("#productSearch")?.value || "");
   const category = $("#productCategoryFilter")?.value || "all";
   const status = $("#productStatusFilter")?.value || "all";
-  const haystack = normalizeText([product.title, product.desc, product.badge, product.weight, product.origin, ...(product.tags || [])].join(" "));
+  const haystack = normalizeText([product.title, product.desc, categoryName(product.category), product.weight, product.origin, ...(product.tags || [])].join(" "));
   if (term && !haystack.includes(term)) return false;
   if (category !== "all" && product.category !== category) return false;
   if (status === "active" && product.active === false) return false;
@@ -102,7 +122,7 @@ function renderProductsTable() {
     const low = Number(product.stock) <= Number(settings.lowStockLimit || 10);
     return `
       <div class="table-row">
-        <div class="table-img"><img src="${imageSrc(mainProductImage(product))}" style="object-fit:${product.imageFit || 'cover'};object-position:${product.imagePosition || 'center center'}" onerror="this.src='../assets/product-akgun.png'" alt="${product.title}" /></div>
+        <div class="table-img"><img src="${imageSrc(productImages(product)[0])}" style="${imageStyle(productImages(product)[0])}" onerror="this.src='../assets/product-akgun.png'" alt="${product.title}" /></div>
         <div class="product-title"><strong>${product.title}</strong><span>${categoryName(product.category)} · ${product.weight || "Gramaj yok"}</span></div>
         <div>${money(product.price)}</div>
         <div>${product.stock} adet</div>
@@ -144,10 +164,12 @@ function openProductEditor(productId = null) {
     editingProduct.badge = "";
     editingProduct.tags = [];
     editingProduct.image = "";
+    editingProduct.images = [];
     isCreatingProduct = true;
   }
 
   if (!editingProduct) return toast("Ürün bulunamadı.");
+  selectedProductImageIndex = 0;
   $("#editorTitle").textContent = isCreatingProduct ? "Yeni Ürün Ekle" : "Ürünü Düzenle";
   $("#deleteEditorProductButton").style.display = isCreatingProduct ? "none" : "inline-flex";
   fillProductEditor();
@@ -157,8 +179,9 @@ function openProductEditor(productId = null) {
 function fillProductEditor() {
   editingProduct.images = productImages(editingProduct);
   editingProduct.image = mainProductImage(editingProduct);
-  editingProduct.imageFit = editingProduct.imageFit || "cover";
-  editingProduct.imagePosition = editingProduct.imagePosition || "center center";
+  editingProduct.imageFit = editingProduct.images[0]?.fit || editingProduct.imageFit || "cover";
+  editingProduct.imagePosition = editingProduct.images[0]?.position || editingProduct.imagePosition || "center center";
+  selectedProductImageIndex = Math.min(selectedProductImageIndex, Math.max(editingProduct.images.length - 1, 0));
 
   $("#editorTitleInput").value = editingProduct.title || "";
   $("#editorDesc").value = editingProduct.desc || "";
@@ -171,14 +194,14 @@ function fillProductEditor() {
   $("#editorPrice").value = editingProduct.price || 0;
   $("#editorOldPrice").value = editingProduct.oldPrice || 0;
   $("#editorStock").value = editingProduct.stock || 0;
-  $("#editorBadge").value = editingProduct.badge || "";
   $("#editorActive").checked = editingProduct.active !== false;
   $("#editorFeatured").checked = Boolean(editingProduct.featured);
   $("#editorBestSeller").checked = Boolean(editingProduct.bestSeller);
   $("#editorCampaign").checked = Boolean(editingProduct.campaignActive);
   $("#editorImageUrl").value = "";
-  $("#editorImageFit").value = editingProduct.imageFit || "cover";
-  $("#editorImagePosition").value = editingProduct.imagePosition || "center center";
+  const selectedImage = editingProduct.images[selectedProductImageIndex] || editingProduct.images[0];
+  $("#editorSelectedImageFit").value = selectedImage?.fit || "cover";
+  $("#editorSelectedImagePosition").value = selectedImage?.position || "center center";
   renderProductPreview();
 }
 function collectEditorProduct() {
@@ -195,47 +218,82 @@ function collectEditorProduct() {
     price: Number($("#editorPrice").value || 0),
     oldPrice: Number($("#editorOldPrice").value || 0),
     stock: Number($("#editorStock").value || 0),
-    badge: $("#editorBadge").value.trim(),
+    badge: "",
     active: $("#editorActive").checked,
     featured: $("#editorFeatured").checked,
     bestSeller: $("#editorBestSeller").checked,
     campaignActive: $("#editorCampaign").checked,
-    imageFit: $("#editorImageFit").value,
-    imagePosition: $("#editorImagePosition").value,
-    image: images[0] || "assets/product-akgun.png",
+    imageFit: images[0]?.fit || "cover",
+    imagePosition: images[0]?.position || "center center",
+    image: images[0]?.url || "assets/product-akgun.png",
     images
   };
 }
+function syncSelectedImageControls() {
+  const selected = editingProduct?.images?.[selectedProductImageIndex];
+  const label = $("#selectedImageLabel");
+  if (label) label.textContent = selected ? `${selectedProductImageIndex + 1}. görsel seçili` : "Görsel seçilmedi";
+  if ($("#editorSelectedImageFit")) $("#editorSelectedImageFit").value = selected?.fit || "cover";
+  if ($("#editorSelectedImagePosition")) $("#editorSelectedImagePosition").value = selected?.position || "center center";
+}
+
 function renderProductPreview() {
-  const images = productImages(editingProduct);
-  const fit = $("#editorImageFit")?.value || editingProduct?.imageFit || "cover";
-  const position = $("#editorImagePosition")?.value || editingProduct?.imagePosition || "center center";
+  editingProduct.images = productImages(editingProduct);
+  selectedProductImageIndex = Math.min(selectedProductImageIndex, Math.max(editingProduct.images.length - 1, 0));
+  const images = editingProduct.images;
+  const selected = images[selectedProductImageIndex] || images[0];
   const main = images[0];
-  $("#productImagePreview").innerHTML = main
-    ? `<img src="${imageSrc(main)}" style="object-fit:${fit};object-position:${position}" onerror="this.parentElement.textContent='Görsel yüklenemedi'" alt="Ürün görseli" />`
+
+  $("#productImagePreview").innerHTML = main?.url
+    ? `<img src="${imageSrc(main)}" style="${imageStyle(main)}" onerror="this.parentElement.textContent='Görsel yüklenemedi'" alt="Ürün kapak görseli" />`
     : "Görsel yok";
 
   const gallery = $("#productGalleryPreview");
   if (!gallery) return;
   gallery.innerHTML = images.map((image, index) => `
-    <div class="gallery-item ${index === 0 ? "cover" : ""}">
-      <img src="${imageSrc(image)}" style="object-fit:${fit};object-position:${position}" onerror="this.src='../assets/product-akgun.png'" alt="Ürün görseli ${index + 1}" />
+    <div class="gallery-item ${index === 0 ? "cover" : ""} ${index === selectedProductImageIndex ? "selected" : ""}" data-select-image="${index}">
+      <img src="${imageSrc(image)}" style="${imageStyle(image)}" onerror="this.src='../assets/product-akgun.png'" alt="Ürün görseli ${index + 1}" />
+      <div class="gallery-item-meta">
+        <strong>${index === 0 ? "Kapak" : `${index + 1}. görsel`}</strong>
+        <small>${image.fit === "contain" ? "Tamamı görünür" : "Kırp / doldur"} · ${image.position || "Orta"}</small>
+      </div>
       <div class="gallery-item-actions">
+        <button type="button" data-select-image-action="${index}">Düzenle</button>
         <button type="button" data-cover-image="${index}" ${index === 0 ? "disabled" : ""}>Kapak yap</button>
         <button type="button" data-remove-image="${index}">Sil</button>
       </div>
     </div>
   `).join("") || `<div class="empty-state">Henüz görsel eklenmedi.</div>`;
 
-  $$('[data-cover-image]').forEach((button) => button.addEventListener("click", () => setCoverImage(Number(button.dataset.coverImage))));
-  $$('[data-remove-image]').forEach((button) => button.addEventListener("click", () => removeProductImage(Number(button.dataset.removeImage))));
+  syncSelectedImageControls();
+  $$('[data-select-image], [data-select-image-action]').forEach((item) => item.addEventListener("click", (event) => {
+    event.stopPropagation();
+    selectedProductImageIndex = Number(item.dataset.selectImage ?? item.dataset.selectImageAction ?? 0);
+    renderProductPreview();
+  }));
+  $$('[data-cover-image]').forEach((button) => button.addEventListener("click", (event) => { event.stopPropagation(); setCoverImage(Number(button.dataset.coverImage)); }));
+  $$('[data-remove-image]').forEach((button) => button.addEventListener("click", (event) => { event.stopPropagation(); removeProductImage(Number(button.dataset.removeImage)); }));
+}
+
+function updateSelectedImageSettings() {
+  if (!editingProduct?.images?.length) return;
+  const selected = editingProduct.images[selectedProductImageIndex];
+  if (!selected) return;
+  selected.fit = $("#editorSelectedImageFit")?.value || "cover";
+  selected.position = $("#editorSelectedImagePosition")?.value || "center center";
+  editingProduct.imageFit = editingProduct.images[0]?.fit || "cover";
+  editingProduct.imagePosition = editingProduct.images[0]?.position || "center center";
+  renderProductPreview();
 }
 
 function addProductImage(url) {
   const clean = String(url || "").trim();
   if (!clean) return;
-  editingProduct.images = [...new Set([...productImages(editingProduct), clean])];
-  editingProduct.image = editingProduct.images[0];
+  const current = productImages(editingProduct).filter((item) => item.url !== "assets/product-akgun.png" || editingProduct.image);
+  if (current.some((item) => item.url === clean)) return toast("Bu görsel zaten galeride var.");
+  editingProduct.images = [...current, { url: clean, fit: "cover", position: "center center" }];
+  editingProduct.image = editingProduct.images[0]?.url || "";
+  selectedProductImageIndex = editingProduct.images.length - 1;
   renderProductPreview();
 }
 
@@ -244,14 +302,18 @@ function setCoverImage(index) {
   if (!images[index]) return;
   const [selected] = images.splice(index, 1);
   editingProduct.images = [selected, ...images];
-  editingProduct.image = selected;
+  editingProduct.image = selected.url;
+  editingProduct.imageFit = selected.fit || "cover";
+  editingProduct.imagePosition = selected.position || "center center";
+  selectedProductImageIndex = 0;
   renderProductPreview();
 }
 
 function removeProductImage(index) {
   const images = productImages(editingProduct).filter((_, imageIndex) => imageIndex !== index);
   editingProduct.images = images.length ? images : [];
-  editingProduct.image = images[0] || "";
+  editingProduct.image = images[0]?.url || "";
+  selectedProductImageIndex = Math.min(selectedProductImageIndex, Math.max(images.length - 1, 0));
   renderProductPreview();
 }
 async function saveEditorProduct() {
@@ -338,7 +400,11 @@ async function handleProductImageFiles(input) {
 
 async function quickAddCategory() {
   const label = prompt("Yeni kategori adını yaz:");
-  if (!label) return;
+  if (!label) {
+    const fallback = editingProduct?.category || categories()[0]?.key || "tulum";
+    $("#editorCategory").value = fallback;
+    return;
+  }
   const baseKey = slugifyCategory(label);
   let key = baseKey;
   let counter = 2;
@@ -347,8 +413,10 @@ async function quickAddCategory() {
   content = normalizeContent({ ...content, categories: [...(content.categories || []), category] });
   content = await saveContent(content);
   fillProductFilters();
+  renderCategoryManager();
   $("#editorCategory").value = key;
-  toast("Yeni kategori eklendi.");
+  if (editingProduct) editingProduct.category = key;
+  toast("Yeni kategori eklendi ve ürüne seçildi.");
 }
 
 
@@ -727,10 +795,12 @@ function bindEvents() {
     editingProduct.image = "";
     renderProductPreview();
   });
-  $("#editorImageFit").addEventListener("change", renderProductPreview);
-  $("#editorImagePosition").addEventListener("change", renderProductPreview);
+  $("#editorSelectedImageFit").addEventListener("change", updateSelectedImageSettings);
+  $("#editorSelectedImagePosition").addEventListener("change", updateSelectedImageSettings);
+  $("#editorCategory").addEventListener("change", () => {
+    if ($("#editorCategory").value === "__add_category__") quickAddCategory();
+  });
   $("#editorImageFile").addEventListener("change", () => handleProductImageFiles($("#editorImageFile")));
-  $("#quickAddCategoryButton").addEventListener("click", quickAddCategory);
   $("#saveCategoriesButton").addEventListener("click", saveCategoryManager);
   $("#addCategoryManagerButton").addEventListener("click", addCategoryFromManager);
   $("#settingsForm").addEventListener("submit", saveSettingsForm);

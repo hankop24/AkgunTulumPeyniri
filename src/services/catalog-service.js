@@ -80,13 +80,31 @@ export async function resetProducts() {
 
 
 function normalizeProductImages(product) {
+  const fallback = {
+    fit: ["cover", "contain"].includes(product.imageFit) ? product.imageFit : "cover",
+    position: String(product.imagePosition || "center center")
+  };
+
+  const toImageObject = (item) => {
+    const url = typeof item === "object" ? item?.url || item?.src || item?.image : item;
+    return {
+      url: String(url || "").trim(),
+      fit: ["cover", "contain"].includes(item?.fit) ? item.fit : fallback.fit,
+      position: String(item?.position || fallback.position)
+    };
+  };
+
   const fromImages = Array.isArray(product.images) ? product.images : [];
   const fromLegacy = product.image ? [product.image] : [];
-  const list = [...fromImages, ...fromLegacy]
-    .map((item) => String(item || "").trim())
-    .filter(Boolean);
-  const unique = [...new Set(list)];
-  return unique.length ? unique : ["assets/product-akgun.png"];
+  const list = [...fromImages, ...fromLegacy].map(toImageObject).filter((item) => item.url);
+  const seen = new Set();
+  const unique = list.filter((item) => {
+    if (seen.has(item.url)) return false;
+    seen.add(item.url);
+    return true;
+  });
+
+  return unique.length ? unique : [{ url: "assets/product-akgun.png", fit: "cover", position: "center center" }];
 }
 
 export function normalizeProduct(product) {
@@ -97,11 +115,11 @@ export function normalizeProduct(product) {
     price: Number(product.price || 0),
     oldPrice: Number(product.oldPrice || 0),
     category: String(product.category || "tulum"),
-    badge: String(product.badge || ""),
-    image: normalizeProductImages(product)[0],
+    badge: "",
+    image: normalizeProductImages(product)[0]?.url || "assets/product-akgun.png",
     images: normalizeProductImages(product),
-    imageFit: ["cover", "contain"].includes(product.imageFit) ? product.imageFit : "cover",
-    imagePosition: String(product.imagePosition || "center center"),
+    imageFit: normalizeProductImages(product)[0]?.fit || "cover",
+    imagePosition: normalizeProductImages(product)[0]?.position || "center center",
     weight: String(product.weight || "500g"),
     origin: String(product.origin || "Erzincan"),
     stock: Number(product.stock || 0),
@@ -125,9 +143,9 @@ export function createEmptyProduct(products = []) {
     price: 0,
     oldPrice: 0,
     category: "tulum",
-    badge: "Yeni",
-    image: "assets/product-akgun.png",
-    images: ["assets/product-akgun.png"],
+    badge: "",
+    image: "",
+    images: [],
     imageFit: "cover",
     imagePosition: "center center",
     weight: "500g",

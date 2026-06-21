@@ -160,24 +160,40 @@ function renderCategoryChips() {
   });
 }
 
+function normalizeGalleryItem(item, fallback = {}) {
+  const url = typeof item === "object" ? item?.url || item?.src || item?.image : item;
+  return {
+    url: String(url || "").trim(),
+    fit: ["cover", "contain"].includes(item?.fit) ? item.fit : (fallback.fit || "cover"),
+    position: String(item?.position || fallback.position || "center center")
+  };
+}
+
 function imageSrc(image) {
-  return image || "assets/product-akgun.png";
+  const url = typeof image === "object" ? image?.url : image;
+  return url || "assets/product-akgun.png";
 }
 
 function productImages(product = {}) {
+  const fallback = { fit: product.imageFit || "cover", position: product.imagePosition || "center center" };
   const list = Array.isArray(product.images) ? product.images : [];
-  const legacy = product.image ? [product.image] : [];
-  const merged = [...list, ...legacy].map((item) => String(item || "").trim()).filter(Boolean);
-  const unique = [...new Set(merged)];
-  return unique.length ? unique : ["assets/product-akgun.png"];
+  const merged = [...list, product.image].map((item) => normalizeGalleryItem(item, fallback)).filter((item) => item.url);
+  const seen = new Set();
+  const unique = merged.filter((item) => {
+    if (seen.has(item.url)) return false;
+    seen.add(item.url);
+    return true;
+  });
+  return unique.length ? unique : [{ url: "assets/product-akgun.png", fit: "cover", position: "center center" }];
 }
 
 function mainProductImage(product = {}) {
-  return productImages(product)[0] || "assets/product-akgun.png";
+  return productImages(product)[0]?.url || "assets/product-akgun.png";
 }
 
-function imageStyle(product = {}) {
-  return `object-fit:${product.imageFit || "cover"};object-position:${product.imagePosition || "center center"}`;
+function imageStyle(imageOrProduct = {}) {
+  const image = imageOrProduct.url ? imageOrProduct : productImages(imageOrProduct)[0];
+  return `object-fit:${image?.fit || "cover"};object-position:${image?.position || "center center"}`;
 }
 
 function renderFeaturedProducts() {
@@ -186,8 +202,8 @@ function renderFeaturedProducts() {
   const featured = products.filter((product) => product.featured).slice(0, 4);
   featuredGrid.innerHTML = featured.map((product) => `
     <button class="featured-card" data-id="${product.id}">
-      <img src="${imageSrc(mainProductImage(product))}" style="${imageStyle(product)}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" />
-      <span>${product.badge || "Seçili"}</span>
+      <img src="${imageSrc(productImages(product)[0])}" style="${imageStyle(productImages(product)[0])}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" />
+      <span>${product.campaignActive ? "Kampanya" : product.bestSeller ? "Çok satan" : "Öne çıkan"}</span>
       <strong>${product.title}</strong>
       <small>${money(product.price)} · ${product.weight}</small>
     </button>
@@ -214,10 +230,10 @@ function renderProducts() {
     return `
       <article class="product-card">
         <div class="product-image">
-          <img src="${imageSrc(mainProductImage(product))}" style="${imageStyle(product)}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" />
-          ${product.badge ? `<span class="badge">${product.badge}</span>` : ""}
+          <img src="${imageSrc(productImages(product)[0])}" style="${imageStyle(productImages(product)[0])}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" />
           ${product.bestSeller ? `<span class="badge best-seller-badge">Çok satan</span>` : ""}
           ${discount > 0 ? `<span class="discount-badge">%${discount}</span>` : ""}
+          ${product.campaignActive ? `<span class="campaign-badge">Kampanya</span>` : ""}
         </div>
         <div class="product-info">
           <p class="product-category-line">${categoryLabels[product.category] || product.category} · ${product.weight}</p>
@@ -300,7 +316,7 @@ function renderCart() {
 
   cartItems.innerHTML = cart.map((item) => `
     <div class="cart-item">
-      <img src="${imageSrc(mainProductImage(item))}" style="${imageStyle(item)}" onerror="this.src='assets/product-akgun.png'" alt="${item.title}" />
+      <img src="${imageSrc(productImages(item)[0])}" style="${imageStyle(productImages(item)[0])}" onerror="this.src='assets/product-akgun.png'" alt="${item.title}" />
       <div><h4>${item.title}</h4><p>${money(item.price)} · ${item.qty} adet · ${item.weight}</p></div>
       <div class="qty-controls">
         <button data-id="${item.id}" data-dir="-1">−</button>
@@ -336,10 +352,10 @@ function openProductModal(productId) {
   const images = productImages(product);
   modalBody.innerHTML = `
     <div class="modal-gallery">
-      <div class="modal-product-image"><img id="modalMainImage" src="${imageSrc(images[0])}" style="${imageStyle(product)}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" /></div>
+      <div class="modal-product-image"><img id="modalMainImage" src="${imageSrc(images[0])}" style="${imageStyle(images[0])}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" /></div>
       ${images.length > 1 ? `<div class="modal-thumbs">${images.map((image, index) => `
         <button class="modal-thumb ${index === 0 ? "active" : ""}" data-modal-image="${index}">
-          <img src="${imageSrc(image)}" style="${imageStyle(product)}" onerror="this.src='assets/product-akgun.png'" alt="${product.title} görsel ${index + 1}" />
+          <img src="${imageSrc(image)}" style="${imageStyle(image)}" onerror="this.src='assets/product-akgun.png'" alt="${product.title} görsel ${index + 1}" />
         </button>`).join("")}</div>` : ""}
     </div>
     <div class="modal-product-info">
@@ -364,7 +380,10 @@ function openProductModal(productId) {
   qsa(".modal-thumb").forEach((button) => button.addEventListener("click", () => {
     const index = Number(button.dataset.modalImage || 0);
     const main = qs("#modalMainImage");
-    if (main && images[index]) main.src = imageSrc(images[index]);
+    if (main && images[index]) {
+      main.src = imageSrc(images[index]);
+      main.setAttribute("style", imageStyle(images[index]));
+    }
     qsa(".modal-thumb").forEach((thumb) => thumb.classList.toggle("active", thumb === button));
   }));
   qs("#modalAddToCart")?.addEventListener("click", () => { closeProductModal(); addToCart(productId); });
