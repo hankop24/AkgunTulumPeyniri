@@ -1,6 +1,14 @@
 export const STORAGE_KEYS = {
-  products: "akgun.products.v1",
-  settings: "akgun.settings.v1"
+  products: "akgun.products.v2",
+  settings: "akgun.settings.v2",
+  content: "akgun.content.v2"
+};
+
+export const FIRESTORE_COLLECTIONS = {
+  products: "products",
+  site: "site",
+  settingsDoc: "settings",
+  contentDoc: "content"
 };
 
 export const categoryLabels = {
@@ -17,3 +25,11 @@ export const categoryLabels = {
 };
 
 export const weightOptions = ["500g", "650g", "700g", "800g", "1000g", "Set"];
+
+export const ADMIN_SECTIONS = [
+  { id: "dashboard", label: "Genel Bakış" },
+  { id: "products", label: "Ürünler" },
+  { id: "content", label: "Sayfa İçerikleri" },
+  { id: "settings", label: "Site Ayarları" },
+  { id: "data", label: "Veri & Yayın" }
+];

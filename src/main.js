@@ -1,3 +1,5 @@
 import { initStorefront } from "./ui/storefront.js";
 
-initStorefront();
+initStorefront().catch((error) => {
+  console.error("Mağaza başlatılamadı:", error);
+});

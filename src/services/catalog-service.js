@@ -1,36 +1,68 @@
-import { STORAGE_KEYS } from "../config/app-config.js";
+import { STORAGE_KEYS, FIRESTORE_COLLECTIONS } from "../config/app-config.js";
 import { defaultProducts } from "../data/default-products.js";
 import { parseTags } from "../utils/format.js";
+import { isFirebaseConfigured, readCollection, writeCollectionDoc, deleteCollectionDoc } from "./backend-service.js";
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
-export function getProducts() {
+function localProducts() {
   try {
     const stored = localStorage.getItem(STORAGE_KEYS.products);
-    if (!stored) return clone(defaultProducts);
+    if (!stored) return clone(defaultProducts).map(normalizeProduct);
     const parsed = JSON.parse(stored);
-    if (!Array.isArray(parsed)) return clone(defaultProducts);
-    return parsed.map(normalizeProduct);
+    return Array.isArray(parsed) ? parsed.map(normalizeProduct) : clone(defaultProducts).map(normalizeProduct);
   } catch (error) {
     console.warn("Ürün verisi okunamadı, varsayılan liste kullanılıyor.", error);
-    return clone(defaultProducts);
+    return clone(defaultProducts).map(normalizeProduct);
   }
 }
 
-export function saveProducts(products) {
+export async function getProducts() {
+  if (isFirebaseConfigured()) {
+    try {
+      const remote = await readCollection(FIRESTORE_COLLECTIONS.products);
+      if (Array.isArray(remote) && remote.length) return remote.map(normalizeProduct).sort((a, b) => Number(a.order || 9999) - Number(b.order || 9999));
+    } catch (error) {
+      console.warn("Firebase ürünleri okunamadı, yerel veri kullanılıyor.", error);
+    }
+  }
+  return localProducts();
+}
+
+export async function saveProducts(products) {
   const normalized = products.map(normalizeProduct);
   localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(normalized));
+  if (isFirebaseConfigured()) {
+    await Promise.all(normalized.map((product) => writeCollectionDoc(FIRESTORE_COLLECTIONS.products, product.id, product)));
+  }
   return normalized;
 }
 
-export function resetProducts() {
+export async function saveProduct(product) {
+  const normalized = normalizeProduct(product);
+  const products = localProducts();
+  const exists = products.some((item) => String(item.id) === String(normalized.id));
+  const next = exists ? products.map((item) => String(item.id) === String(normalized.id) ? normalized : item) : [normalized, ...products];
+  localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(next));
+  if (isFirebaseConfigured()) await writeCollectionDoc(FIRESTORE_COLLECTIONS.products, normalized.id, normalized);
+  return normalized;
+}
+
+export async function deleteProduct(productId) {
+  const next = localProducts().filter((item) => String(item.id) !== String(productId));
+  localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(next));
+  if (isFirebaseConfigured()) await deleteCollectionDoc(FIRESTORE_COLLECTIONS.products, productId);
+  return next;
+}
+
+export async function resetProducts() {
   localStorage.removeItem(STORAGE_KEYS.products);
   return getProducts();
 }
 
 export function normalizeProduct(product) {
   return {
-    id: Number(product.id || Date.now()),
+    id: String(product.id || Date.now()),
     title: String(product.title || "Yeni Ürün"),
     desc: String(product.desc || ""),
     price: Number(product.price || 0),
@@ -45,14 +77,17 @@ export function normalizeProduct(product) {
     tags: parseTags(product.tags),
     featured: Boolean(product.featured),
     bestSeller: Boolean(product.bestSeller),
-    active: product.active !== false
+    active: product.active !== false,
+    campaignActive: Boolean(product.campaignActive || product.oldPrice > product.price),
+    order: Number(product.order || 999)
   };
 }
 
 export function createEmptyProduct(products = []) {
-  const nextId = products.length ? Math.max(...products.map((item) => Number(item.id) || 0)) + 1 : 1;
+  const numericIds = products.map((item) => Number(item.id)).filter(Boolean);
+  const nextId = numericIds.length ? Math.max(...numericIds) + 1 : Date.now();
   return normalizeProduct({
-    id: nextId,
+    id: String(nextId),
     title: "Yeni Ürün",
     desc: "Ürün açıklaması",
     price: 0,
@@ -67,6 +102,8 @@ export function createEmptyProduct(products = []) {
     tags: ["Yöresel"],
     featured: false,
     bestSeller: false,
-    active: true
+    active: true,
+    campaignActive: false,
+    order: products.length + 1
   });
 }

@@ -1,27 +1,46 @@
-import { STORAGE_KEYS } from "../config/app-config.js";
+import { STORAGE_KEYS, FIRESTORE_COLLECTIONS } from "../config/app-config.js";
 import { defaultSiteSettings } from "../data/default-site-settings.js";
+import { isFirebaseConfigured, readDoc, writeDoc } from "./backend-service.js";
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
-export function getSiteSettings() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEYS.settings);
-    if (!stored) return clone(defaultSiteSettings);
-    return { ...clone(defaultSiteSettings), ...JSON.parse(stored) };
-  } catch (error) {
-    console.warn("Site ayarları okunamadı, varsayılan ayarlar kullanılıyor.", error);
-    return clone(defaultSiteSettings);
-  }
-}
-
-export function saveSiteSettings(settings) {
+function normalizeSettings(settings = {}) {
   const normalized = { ...clone(defaultSiteSettings), ...settings };
   normalized.freeShippingTarget = Number(normalized.freeShippingTarget || 0);
-  localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(normalized));
+  normalized.lowStockLimit = Number(normalized.lowStockLimit || 10);
   return normalized;
 }
 
-export function resetSiteSettings() {
+function localSettings() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.settings);
+    return stored ? normalizeSettings(JSON.parse(stored)) : normalizeSettings();
+  } catch (error) {
+    console.warn("Site ayarları okunamadı, varsayılan ayarlar kullanılıyor.", error);
+    return normalizeSettings();
+  }
+}
+
+export async function getSiteSettings() {
+  if (isFirebaseConfigured()) {
+    try {
+      const remote = await readDoc(FIRESTORE_COLLECTIONS.site, FIRESTORE_COLLECTIONS.settingsDoc);
+      if (remote) return normalizeSettings(remote);
+    } catch (error) {
+      console.warn("Firebase site ayarları okunamadı, yerel ayarlar kullanılıyor.", error);
+    }
+  }
+  return localSettings();
+}
+
+export async function saveSiteSettings(settings) {
+  const normalized = normalizeSettings(settings);
+  localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(normalized));
+  if (isFirebaseConfigured()) await writeDoc(FIRESTORE_COLLECTIONS.site, FIRESTORE_COLLECTIONS.settingsDoc, normalized);
+  return normalized;
+}
+
+export async function resetSiteSettings() {
   localStorage.removeItem(STORAGE_KEYS.settings);
   return getSiteSettings();
 }

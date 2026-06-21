@@ -3,146 +3,213 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Akgün Admin Paneli</title>
+    <title>Akgün Yönetim Paneli</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="admin.css" />
   </head>
   <body>
-    <aside class="admin-sidebar">
-      <a class="admin-brand" href="../index.html">
-        <img src="../assets/logo-akgun.png" alt="Akgün" />
-      </a>
-      <nav>
-        <button class="nav-tab active" data-tab="dashboard">Genel Bakış</button>
-        <button class="nav-tab" data-tab="products">Ürün Yönetimi</button>
-        <button class="nav-tab" data-tab="settings">Site Ayarları</button>
-        <button class="nav-tab" data-tab="data">Veri / Yedek</button>
-      </nav>
-      <a class="view-site" href="../index.html" target="_blank">Siteyi Aç</a>
-    </aside>
+    <div class="admin-shell">
+      <aside class="sidebar">
+        <a class="brand-card" href="../index.html" target="_blank" aria-label="Siteyi aç">
+          <img src="../assets/logo-akgun.png" alt="Akgün" />
+          <span>Yönetim Paneli</span>
+          <small>Mağaza içerik kontrol merkezi</small>
+        </a>
 
-    <main class="admin-main">
-      <header class="admin-topbar">
-        <div>
-          <p class="eyebrow">Akgün Yönetim Paneli</p>
-          <h1>Ürün, fiyat, kampanya ve site içeriklerini yönet.</h1>
-        </div>
-        <div class="topbar-actions">
-          <button class="secondary" id="resetAllButton">Varsayılana Dön</button>
-          <button class="primary" id="saveAllButton">Tümünü Kaydet</button>
-        </div>
-      </header>
+        <nav class="side-nav" id="sideNav">
+          <button class="active" data-view="dashboard">Panel Özeti</button>
+          <button data-view="products">Ürün Yönetimi</button>
+          <button data-view="sections">Sayfa Bölümleri</button>
+          <button data-view="settings">Site Ayarları</button>
+          <button data-view="data">Veri & Yayın</button>
+        </nav>
 
-      <section class="tab-panel active" id="dashboardPanel">
-        <div class="stat-grid">
-          <article><span>Toplam Ürün</span><strong id="statProducts">0</strong></article>
-          <article><span>Aktif Ürün</span><strong id="statActive">0</strong></article>
-          <article><span>Öne Çıkan</span><strong id="statFeatured">0</strong></article>
-          <article><span>Düşük Stok</span><strong id="statLowStock">0</strong></article>
+        <div class="connection-card">
+          <strong id="backendMode">Bağlantı kontrol ediliyor</strong>
+          <span id="backendDetail">Veri sistemi hazırlanıyor.</span>
         </div>
-        <div class="admin-card">
-          <h2>Panel Mantığı</h2>
-          <p>Bu sürüm statik siteye uygun admin temelidir. Ürünler ve ayarlar tarayıcıdaki localStorage alanına kaydedilir. Aynı tarayıcıda siteyi açtığında değişiklikleri görürsün. Gerçek sunucu/Firebase bağlandığında aynı dosya yapısı korunarak veriler online yönetilebilir.</p>
-        </div>
-      </section>
 
-      <section class="tab-panel" id="productsPanel">
-        <div class="section-line">
+        <a class="site-link" href="../index.html" target="_blank">Canlı Siteyi Aç</a>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
           <div>
-            <h2>Ürün Yönetimi</h2>
-            <p>Ürün ekle, fiyat değiştir, stok/kampanya/öne çıkan ayarlarını düzenle.</p>
+            <p class="micro">Akgün Ticaret</p>
+            <h1 id="viewTitle">Panel Özeti</h1>
+            <p id="viewDescription">Ürün, fiyat, görsel, kampanya ve sayfa içeriklerini buradan yönet.</p>
           </div>
-          <button class="primary" id="newProductButton">Yeni Ürün Ekle</button>
-        </div>
-        <div class="product-admin-layout">
-          <div class="admin-card table-card">
-            <div class="toolbar">
-              <input id="adminSearch" type="search" placeholder="Ürün ara..." />
-              <select id="adminCategoryFilter"></select>
-            </div>
-            <div class="product-table" id="productTable"></div>
+          <div class="topbar-actions">
+            <button class="btn ghost" id="refreshButton">Yenile</button>
+            <button class="btn primary" id="saveEverythingButton">Tümünü Kaydet</button>
           </div>
-          <form class="admin-card product-form" id="productForm">
-            <h3 id="formTitle">Ürün Düzenle</h3>
-            <input type="hidden" id="productId" />
-            <label>Ürün adı<input id="productTitle" required /></label>
-            <label>Açıklama<textarea id="productDesc" rows="4"></textarea></label>
-            <div class="form-grid">
-              <label>Kategori<select id="productCategory"></select></label>
-              <label>Gramaj<input id="productWeight" placeholder="500g" /></label>
-              <label>Fiyat<input id="productPrice" type="number" min="0" /></label>
-              <label>Eski fiyat<input id="productOldPrice" type="number" min="0" /></label>
-              <label>Stok<input id="productStock" type="number" min="0" /></label>
-              <label>Puan<input id="productRating" type="number" min="0" max="5" step="0.1" /></label>
-              <label>Menşei<input id="productOrigin" /></label>
-              <label>Rozet<input id="productBadge" placeholder="Yeni / Kampanya" /></label>
+        </header>
+
+        <section class="view active" id="dashboardView" data-title="Panel Özeti" data-desc="Mağazanın genel durumunu, ürün sayısını ve yayın modunu buradan takip et.">
+          <div class="stats-grid">
+            <article><span>Toplam ürün</span><strong id="statProducts">0</strong></article>
+            <article><span>Aktif ürün</span><strong id="statActive">0</strong></article>
+            <article><span>Öne çıkan</span><strong id="statFeatured">0</strong></article>
+            <article><span>Düşük stok</span><strong id="statLowStock">0</strong></article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel-card hero-card">
+              <span class="pill">Yeni panel tasarımı</span>
+              <h2>Siteyi blok blok yönet.</h2>
+              <p>Ürünler ayrı sayfadan eklenir. Ana sayfadaki duyuru, giriş alanı, öne çıkanlar, ürün açıklaması, marka hikayesi, yorumlar ve SSS ayrı ayrı düzenlenebilir.</p>
+              <div class="hero-actions">
+                <button class="btn primary" data-open-product-new>Yeni Ürün Ekle</button>
+                <button class="btn soft" data-jump="sections">Sayfa Bölümlerini Aç</button>
+              </div>
+            </article>
+
+            <article class="panel-card checklist-card">
+              <h3>Çalışma mantığı</h3>
+              <ul>
+                <li>Firebase bağlanırsa değişiklikler canlı sitede herkes için görünür.</li>
+                <li>Firebase yoksa panel yerel modda çalışır ve tarayıcıda saklar.</li>
+                <li>Ürün görseli URL ya da bilgisayardan dosya seçilerek eklenebilir.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="productsView" data-title="Ürün Yönetimi" data-desc="Ürünleri listele, detayına gir, yeni ürün sayfasından eksiksiz ürün oluştur.">
+          <div class="page-headline">
+            <div>
+              <h2>Ürünler</h2>
+              <p>Burada yalnızca liste görürsün. Yeni ürün eklemek ya da düzenlemek için ayrı ürün sayfası açılır.</p>
             </div>
-            <label>Görsel yolu / URL<input id="productImage" placeholder="assets/product-tub.png" /></label>
-            <label>Etiketler<textarea id="productTags" rows="2" placeholder="Kavanoz, Aile boyu, Soğuk zincir"></textarea></label>
-            <div class="switch-grid">
-              <label><input id="productFeatured" type="checkbox" /> Öne çıkan</label>
-              <label><input id="productBestSeller" type="checkbox" /> Çok satan</label>
-              <label><input id="productActive" type="checkbox" /> Aktif ürün</label>
+            <button class="btn primary" id="addProductButton">+ Yeni Ürün Ekle</button>
+          </div>
+
+          <div class="panel-card product-list-card">
+            <div class="list-toolbar">
+              <input id="productSearch" type="search" placeholder="Ürün adı, açıklama, rozet ya da etiket ara..." />
+              <select id="productCategoryFilter"></select>
+              <select id="productStatusFilter">
+                <option value="all">Tüm durumlar</option>
+                <option value="active">Sitede görünenler</option>
+                <option value="passive">Gizlenenler</option>
+                <option value="featured">Öne çıkanlar</option>
+                <option value="campaign">Kampanyalar</option>
+                <option value="low-stock">Düşük stok</option>
+              </select>
             </div>
-            <div class="form-actions">
-              <button type="button" class="danger" id="deleteProductButton">Sil</button>
-              <button type="submit" class="primary">Ürünü Kaydet</button>
+            <div class="products-table" id="productsTable"></div>
+          </div>
+        </section>
+
+        <section class="view" id="productEditorView" data-title="Ürün Detayı" data-desc="Ürünün bütün bilgilerini doldur ve kaydet. Kayıttan önce siteye eklenmez.">
+          <div class="page-headline editor-headline">
+            <div>
+              <button class="back-button" id="backToProductsButton">← Ürün listesine dön</button>
+              <h2 id="editorTitle">Yeni Ürün</h2>
+              <p>Bu sayfadaki bilgiler tamamlanınca ürün listeye ve siteye kaydedilir.</p>
             </div>
+            <div class="editor-actions-top">
+              <button class="btn danger" id="deleteEditorProductButton">Ürünü Sil</button>
+              <button class="btn primary" id="saveEditorProductButton">Ürünü Kaydet</button>
+            </div>
+          </div>
+
+          <form class="product-editor-grid" id="productEditorForm">
+            <section class="panel-card editor-card large">
+              <h3>Temel Bilgiler</h3>
+              <label>Ürün adı<input id="editorTitleInput" required placeholder="Örn. Erzincan Tulum Peyniri" /></label>
+              <label>Kısa açıklama<textarea id="editorDesc" rows="5" placeholder="Ürünün sitede görünen açıklaması"></textarea></label>
+              <div class="form-grid two">
+                <label>Kategori<select id="editorCategory"></select></label>
+                <label>Gramaj / Paket<input id="editorWeight" placeholder="500g / 1kg / Set" /></label>
+                <label>Menşei<input id="editorOrigin" placeholder="Erzincan" /></label>
+                <label>Sıralama<input id="editorOrder" type="number" min="1" /></label>
+              </div>
+              <label>Etiketler<textarea id="editorTags" rows="3" placeholder="Her etiketi virgülle ayır: Katkısız, Vakum paket, Soğuk zincir"></textarea></label>
+            </section>
+
+            <section class="panel-card editor-card">
+              <h3>Fiyat & Stok</h3>
+              <div class="form-grid two">
+                <label>Satış fiyatı<input id="editorPrice" type="number" min="0" /></label>
+                <label>Eski fiyat<input id="editorOldPrice" type="number" min="0" /></label>
+                <label>Stok adedi<input id="editorStock" type="number" min="0" /></label>
+                <label>Puan<input id="editorRating" type="number" min="0" max="5" step="0.1" /></label>
+              </div>
+              <label>Ürün rozeti<input id="editorBadge" placeholder="Yeni / Kampanya / Çok Satan" /></label>
+              <div class="switch-stack">
+                <label><input id="editorActive" type="checkbox" /> Sitede görünsün</label>
+                <label><input id="editorFeatured" type="checkbox" /> Öne çıkanlarda göster</label>
+                <label><input id="editorBestSeller" type="checkbox" /> Çok satan olarak işaretle</label>
+                <label><input id="editorCampaign" type="checkbox" /> Kampanya aktif</label>
+              </div>
+            </section>
+
+            <section class="panel-card editor-card image-editor-card">
+              <h3>Ürün Görseli</h3>
+              <div class="image-preview" id="productImagePreview">Görsel yok</div>
+              <label>Görsel yolu / URL<input id="editorImage" placeholder="assets/product-tub.png veya https://..." /></label>
+              <label class="file-drop">Bilgisayardan görsel seç
+                <input id="editorImageFile" type="file" accept="image/*" />
+              </label>
+              <small>Dosya seçersen görsel veri olarak kaydedilir. Gerçek sunucuya yükleme için sonraki aşamada Firebase Storage bağlanabilir.</small>
+            </section>
           </form>
-        </div>
-      </section>
+        </section>
 
-      <section class="tab-panel" id="settingsPanel">
-        <form class="admin-card settings-form" id="settingsForm">
-          <h2>Site Ayarları</h2>
-          <div class="form-grid two">
-            <label>WhatsApp numarası<input id="whatsappNumber" placeholder="905XXXXXXXXX" /></label>
-            <label>Telefon numarası<input id="phoneNumber" placeholder="+905XXXXXXXXX" /></label>
-            <label>Ücretsiz kargo limiti<input id="freeShippingTarget" type="number" min="0" /></label>
-            <label>Sayfa başlığı<input id="pageTitle" /></label>
-          </div>
-          <label>Meta açıklama<textarea id="metaDescription" rows="2"></textarea></label>
-          <div class="form-grid two">
-            <label>Duyuru 1<input id="announcementPrimary" /></label>
-            <label>Duyuru 2<input id="announcementSecondary" /></label>
-          </div>
-          <label>Hero küçük başlık<input id="heroEyebrow" /></label>
-          <label>Hero başlık<textarea id="heroTitle" rows="2"></textarea></label>
-          <label>Hero açıklama<textarea id="heroText" rows="3"></textarea></label>
-          <div class="form-grid three">
-            <label>İstatistik 1 değer<input id="statOneValue" /></label>
-            <label>İstatistik 2 değer<input id="statTwoValue" /></label>
-            <label>İstatistik 3 değer<input id="statThreeValue" /></label>
-          </div>
-          <div class="form-grid three">
-            <label>İstatistik 1 metin<input id="statOneLabel" /></label>
-            <label>İstatistik 2 metin<input id="statTwoLabel" /></label>
-            <label>İstatistik 3 metin<input id="statThreeLabel" /></label>
-          </div>
-          <label>Öne çıkanlar başlığı<input id="featuredTitle" /></label>
-          <label>Öne çıkanlar metni<textarea id="featuredText" rows="2"></textarea></label>
-          <label>Ürünler metni<textarea id="productsText" rows="2"></textarea></label>
-          <label>Marka hikayesi başlığı<input id="storyTitle" /></label>
-          <label>Marka hikayesi metni<textarea id="storyText" rows="3"></textarea></label>
-          <label>Varsayılan WhatsApp mesajı<textarea id="whatsappDefaultMessage" rows="2"></textarea></label>
-          <div class="form-actions right"><button type="submit" class="primary">Ayarları Kaydet</button></div>
-        </form>
-      </section>
+        <section class="view" id="sectionsView" data-title="Sayfa Bölümleri" data-desc="Ana sayfadaki her bloğu ayrı ayrı düzenle. İstersen bölümü gizle ya da metnini değiştir.">
+          <div class="sections-layout">
+            <aside class="section-menu" id="sectionMenu">
+              <button class="active" data-section="announcement">Üst Duyuru</button>
+              <button data-section="hero">Giriş / Hero</button>
+              <button data-section="quality">Kalite Kutuları</button>
+              <button data-section="featured">Öne Çıkanlar</button>
+              <button data-section="products">Ürün Alanı</button>
+              <button data-section="story">Marka Hikayesi</button>
+              <button data-section="testimonials">Yorumlar</button>
+              <button data-section="faq">SSS</button>
+              <button data-section="navigation">Menü Linkleri</button>
+              <button data-section="footer">Footer</button>
+            </aside>
 
-      <section class="tab-panel" id="dataPanel">
-        <div class="admin-card">
-          <h2>Yedekleme ve Aktarım</h2>
-          <p>Ürünleri ve site ayarlarını JSON olarak dışa aktarabilir, daha sonra tekrar içe aktarabilirsin.</p>
-          <div class="data-actions">
-            <button class="primary" id="exportButton">JSON Dışa Aktar</button>
-            <label class="file-button">JSON İçe Aktar<input id="importInput" type="file" accept="application/json" hidden /></label>
+            <div class="sections-editor" id="sectionsEditor"></div>
           </div>
-          <textarea id="dataPreview" rows="14" readonly></textarea>
-        </div>
-      </section>
-    </main>
+        </section>
+
+        <section class="view" id="settingsView" data-title="Site Ayarları" data-desc="Marka, iletişim, SEO, kargo ve WhatsApp ayarlarını düzenle.">
+          <form class="panel-card settings-card" id="settingsForm">
+            <h2>Genel Site Ayarları</h2>
+            <div class="form-grid two">
+              <label>Marka adı<input id="settingBrandName" /></label>
+              <label>Tarayıcı başlığı<input id="settingPageTitle" /></label>
+              <label>WhatsApp numarası<input id="settingWhatsappNumber" placeholder="905XXXXXXXXX" /></label>
+              <label>Telefon numarası<input id="settingPhoneNumber" placeholder="+905XXXXXXXXX" /></label>
+              <label>Ücretsiz kargo limiti<input id="settingFreeShippingTarget" type="number" min="0" /></label>
+              <label>Düşük stok limiti<input id="settingLowStockLimit" type="number" min="0" /></label>
+            </div>
+            <label>Meta açıklama<textarea id="settingMetaDescription" rows="3"></textarea></label>
+            <label>Varsayılan WhatsApp mesajı<textarea id="settingWhatsappDefaultMessage" rows="3"></textarea></label>
+            <div class="form-footer"><button class="btn primary" type="submit">Ayarları Kaydet</button></div>
+          </form>
+        </section>
+
+        <section class="view" id="dataView" data-title="Veri & Yayın" data-desc="Yedek al, JSON içe aktar veya Firebase’e varsayılan verileri gönder.">
+          <div class="panel-card data-card">
+            <h2>Yedekleme</h2>
+            <p>Ürünler, site ayarları ve sayfa bölümlerini tek JSON dosyası olarak dışa aktarabilirsin.</p>
+            <div class="data-actions">
+              <button class="btn primary" id="exportDataButton">JSON Dışa Aktar</button>
+              <label class="btn soft file-inline">JSON İçe Aktar<input id="importDataInput" type="file" accept="application/json" hidden /></label>
+              <button class="btn ghost" id="seedFirebaseButton">Varsayılan Veriyi Firebase’e Aktar</button>
+              <button class="btn danger" id="resetLocalButton">Yerel Veriyi Sıfırla</button>
+            </div>
+            <textarea id="dataPreview" rows="18" readonly></textarea>
+          </div>
+        </section>
+      </main>
+    </div>
 
     <div class="toast" id="toast"></div>
     <script type="module" src="admin.js"></script>
