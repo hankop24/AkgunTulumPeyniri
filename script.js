@@ -1,1 +1,1 @@
-// Bu sürümde mağaza kodu modüler yapıya taşındı. Giriş dosyası: src/main.js
+// Eski statik script temizlendi. Site artık src/main.js üzerinden çalışır.

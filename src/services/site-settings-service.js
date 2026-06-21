@@ -6,8 +6,9 @@ const clone = (value) => JSON.parse(JSON.stringify(value));
 
 function normalizeSettings(settings = {}) {
   const normalized = { ...clone(defaultSiteSettings), ...settings };
-  normalized.freeShippingTarget = Number(normalized.freeShippingTarget || 0);
-  normalized.lowStockLimit = Number(normalized.lowStockLimit || 10);
+  delete normalized.freeShippingTarget;
+  delete normalized.lowStockLimit;
+  delete normalized.footerText;
   return normalized;
 }
 

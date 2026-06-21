@@ -1,7 +1,7 @@
 import { getProducts, saveProduct, deleteProduct, saveProducts, createEmptyProduct } from "../src/services/catalog-service.js";
 import { getSiteSettings, saveSiteSettings } from "../src/services/site-settings-service.js";
 import { getContent, saveContent, normalizeContent } from "../src/services/content-service.js";
-import { getBackendStatus, seedFirebase, isFirebaseConfigured, signInAdmin, signOutAdmin, onAdminAuthStateChanged, uploadImageFile } from "../src/services/backend-service.js";
+import { getBackendStatus, seedFirebase, isFirebaseConfigured, signInAdmin, signOutAdmin, onAdminAuthStateChanged, uploadImageFile, changeAdminPassword } from "../src/services/backend-service.js";
 import { money, normalizeText, parseTags, slugPhone } from "../src/utils/format.js";
 import { defaultProducts } from "../src/data/default-products.js";
 import { defaultSiteSettings } from "../src/data/default-site-settings.js";
@@ -83,11 +83,9 @@ function switchView(viewName) {
 }
 
 function renderDashboard() {
-  const lowLimit = Number(settings.lowStockLimit || 10);
   $("#statProducts").textContent = products.length;
   $("#statActive").textContent = products.filter((p) => p.active !== false).length;
   $("#statFeatured").textContent = products.filter((p) => p.featured).length;
-  $("#statLowStock").textContent = products.filter((p) => Number(p.stock) <= lowLimit).length;
 }
 
 function categoryOptions(selected = "") {
@@ -112,14 +110,12 @@ function productMatchesFilters(product) {
   if (status === "featured" && !product.featured) return false;
   if (status === "bestSeller" && !product.bestSeller) return false;
   if (status === "campaign" && !product.campaignActive) return false;
-  if (status === "low-stock" && Number(product.stock) > Number(settings.lowStockLimit || 10)) return false;
   return true;
 }
 
 function renderProductsTable() {
   const filtered = orderItems(products).filter(productMatchesFilters);
   const rows = filtered.map((product) => {
-    const low = Number(product.stock) <= Number(settings.lowStockLimit || 10);
     return `
       <div class="table-row">
         <div class="table-img"><img src="${imageSrc(productImages(product)[0])}" style="${imageStyle(productImages(product)[0])}" onerror="this.src='../assets/product-akgun.png'" alt="${product.title}" /></div>
@@ -131,7 +127,6 @@ function renderProductsTable() {
           ${product.featured ? `<span class="tag">Öne çıkan</span>` : ""}
           ${product.bestSeller ? `<span class="tag blue">Çok satan</span>` : ""}
           ${product.campaignActive ? `<span class="tag orange">Kampanya</span>` : ""}
-          ${low ? `<span class="tag orange">Az stok</span>` : ""}
         </div>
         <div class="row-actions">
           <button data-edit-product="${product.id}">Düzenle</button>
@@ -161,7 +156,6 @@ function openProductEditor(productId = null) {
     editingProduct.price = 0;
     editingProduct.oldPrice = 0;
     editingProduct.stock = 0;
-    editingProduct.badge = "";
     editingProduct.tags = [];
     editingProduct.image = "";
     editingProduct.images = [];
@@ -218,7 +212,6 @@ function collectEditorProduct() {
     price: Number($("#editorPrice").value || 0),
     oldPrice: Number($("#editorOldPrice").value || 0),
     stock: Number($("#editorStock").value || 0),
-    badge: "",
     active: $("#editorActive").checked,
     featured: $("#editorFeatured").checked,
     bestSeller: $("#editorBestSeller").checked,
@@ -425,8 +418,6 @@ function fillSettingsForm() {
   $("#settingPageTitle").value = settings.pageTitle || "";
   $("#settingWhatsappNumber").value = settings.whatsappNumber || "";
   $("#settingPhoneNumber").value = settings.phoneNumber || "";
-  $("#settingFreeShippingTarget").value = settings.freeShippingTarget || 0;
-  $("#settingLowStockLimit").value = settings.lowStockLimit || 10;
   $("#settingMetaDescription").value = settings.metaDescription || "";
   $("#settingWhatsappDefaultMessage").value = settings.whatsappDefaultMessage || "";
 }
@@ -439,8 +430,6 @@ async function saveSettingsForm(event) {
     pageTitle: $("#settingPageTitle").value,
     whatsappNumber: slugPhone($("#settingWhatsappNumber").value),
     phoneNumber: $("#settingPhoneNumber").value,
-    freeShippingTarget: Number($("#settingFreeShippingTarget").value || 0),
-    lowStockLimit: Number($("#settingLowStockLimit").value || 10),
     metaDescription: $("#settingMetaDescription").value,
     whatsappDefaultMessage: $("#settingWhatsappDefaultMessage").value
   });
@@ -448,12 +437,59 @@ async function saveSettingsForm(event) {
   toast("Site ayarları kaydedildi.");
 }
 
+async function handlePasswordChange(event) {
+  event.preventDefault();
+  const currentPassword = $("#currentPassword")?.value || "";
+  const newPassword = $("#newPassword")?.value || "";
+  const confirmPassword = $("#newPasswordConfirm")?.value || "";
+  const message = $("#passwordMessage");
+
+  if (newPassword.length < 6) {
+    if (message) message.textContent = "Yeni şifre en az 6 karakter olmalı.";
+    return;
+  }
+  if (newPassword !== confirmPassword) {
+    if (message) message.textContent = "Yeni şifreler eşleşmiyor.";
+    return;
+  }
+
+  try {
+    if (message) message.textContent = "Şifre güncelleniyor...";
+    await changeAdminPassword(currentPassword, newPassword);
+    ["#currentPassword", "#newPassword", "#newPasswordConfirm"].forEach((selector) => {
+      const input = $(selector);
+      if (input) input.value = "";
+    });
+    if (message) message.textContent = "Şifre başarıyla güncellendi.";
+    toast("Admin şifresi güncellendi.");
+  } catch (error) {
+    console.warn("Şifre güncellenemedi.", error);
+    if (message) message.textContent = "Şifre güncellenemedi. Mevcut şifreyi kontrol et veya yeniden giriş yap.";
+  }
+}
+
 const textInput = (id, label, value = "") => `<label>${label}<input data-setting-field="${id}" value="${String(value || "").replaceAll('"', '&quot;')}" /></label>`;
 const textArea = (id, label, value = "", rows = 3) => `<label>${label}<textarea data-setting-field="${id}" rows="${rows}">${value || ""}</textarea></label>`;
+const selectInput = (id, label, value = "", options = []) => `
+  <label>${label}<select data-setting-field="${id}">${options.map((option) => `<option value="${option.value}" ${option.value === value ? "selected" : ""}>${option.label}</option>`).join("")}</select></label>`;
 const imageInput = (id, label, value = "") => `
-  <label>${label}<input data-setting-field="${id}" value="${String(value || "").replaceAll('"', '&quot;')}" placeholder="assets/... veya https://..." /></label>
-  <label class="file-drop">Görsel dosyası seç<input data-setting-file="${id}" type="file" accept="image/*" /></label>
+  <div class="section-image-control">
+    <label>${label}<input data-setting-field="${id}" value="${String(value || "").replaceAll('"', '&quot;')}" placeholder="assets/... veya https://..." /></label>
+    <div class="section-image-preview"><img src="${imageSrc(value)}" onerror="this.parentElement.textContent='Görsel yüklenemedi'" alt="${label}" /></div>
+    <label class="file-drop">Görsel dosyası seç<input data-setting-file="${id}" type="file" accept="image/*" /></label>
+  </div>
 `;
+const fitOptions = [
+  { value: "cover", label: "Alanı doldur / kırp" },
+  { value: "contain", label: "Tamamı görünsün" }
+];
+const positionOptions = [
+  { value: "center center", label: "Orta" },
+  { value: "top center", label: "Üst" },
+  { value: "bottom center", label: "Alt" },
+  { value: "center left", label: "Sol" },
+  { value: "center right", label: "Sağ" }
+];
 
 function renderSectionEditor() {
   $$("#sectionMenu button").forEach((button) => button.classList.toggle("active", button.dataset.section === currentSection));
@@ -470,6 +506,7 @@ function renderSectionEditor() {
     `<div class="form-grid three">${textInput("statOneValue", "İstatistik 1 değer", settings.statOneValue)}${textInput("statTwoValue", "İstatistik 2 değer", settings.statTwoValue)}${textInput("statThreeValue", "İstatistik 3 değer", settings.statThreeValue)}</div>`,
     `<div class="form-grid three">${textInput("statOneLabel", "İstatistik 1 metin", settings.statOneLabel)}${textInput("statTwoLabel", "İstatistik 2 metin", settings.statTwoLabel)}${textInput("statThreeLabel", "İstatistik 3 metin", settings.statThreeLabel)}</div>`,
     imageInput("heroImage", "Hero ürün görseli", settings.heroImage),
+    `<div class="form-grid two">${selectInput("heroImageFit", "Hero görsel görünümü", settings.heroImageFit || "contain", fitOptions)}${selectInput("heroImagePosition", "Hero görsel odak noktası", settings.heroImagePosition || "center center", positionOptions)}</div>`,
     `<div class="form-grid two">${textInput("heroTopCard", "Üst küçük kart", settings.heroTopCard)}${textInput("heroBottomCard", "Alt küçük kart", settings.heroBottomCard)}</div>`
   ]);
   if (currentSection === "quality") root.innerHTML = renderListBlock("Kalite Kutuları", "Katkısız lezzet, ambalaj, teslimat gibi kutuları buradan yönet.", "benefits");
@@ -487,7 +524,8 @@ function renderSectionEditor() {
     textInput("storyEyebrow", "Küçük başlık", settings.storyEyebrow),
     textInput("storyTitle", "Başlık", settings.storyTitle),
     textArea("storyText", "Metin", settings.storyText, 5),
-    imageInput("storyImage", "Marka hikayesi görseli", settings.storyImage)
+    imageInput("storyImage", "Marka hikayesi görseli", settings.storyImage),
+    `<div class="form-grid two">${selectInput("storyImageFit", "Hikaye görsel görünümü", settings.storyImageFit || "cover", fitOptions)}${selectInput("storyImagePosition", "Hikaye görsel odak noktası", settings.storyImagePosition || "center center", positionOptions)}</div>`
   ]);
   if (currentSection === "testimonials") root.innerHTML = renderListWithHeadingBlock("Yorumlar", "Yorum başlığı ve müşteri yorumları.", "testimonials", [
     textInput("testimonialsEyebrow", "Küçük başlık", settings.testimonialsEyebrow),
@@ -498,10 +536,6 @@ function renderSectionEditor() {
     textInput("faqTitle", "Başlık", settings.faqTitle)
   ]);
   if (currentSection === "navigation") root.innerHTML = renderListBlock("Menü Linkleri", "Üst menüde görünen bağlantıları yönet.", "navLinks");
-  if (currentSection === "footer") root.innerHTML = renderSettingsBlock("Footer", "Sayfanın en altındaki marka metni ve iletişim alanı.", [
-    textArea("footerText", "Footer metni", settings.footerText, 3),
-    textInput("whatsappDefaultMessage", "Sabit WhatsApp butonu mesajı", settings.whatsappDefaultMessage)
-  ]);
   bindSectionEditorEvents();
 }
 
@@ -564,6 +598,7 @@ function bindSectionEditorEvents() {
     const target = $(`[data-setting-field="${key}"]`);
     if (target) target.value = imageUrl;
     settings = await saveSiteSettings({ ...settings, [key]: imageUrl });
+    renderSectionEditor();
     toast("Bölüm görseli kaydedildi.");
   })));
 }
@@ -804,6 +839,7 @@ function bindEvents() {
   $("#saveCategoriesButton").addEventListener("click", saveCategoryManager);
   $("#addCategoryManagerButton").addEventListener("click", addCategoryFromManager);
   $("#settingsForm").addEventListener("submit", saveSettingsForm);
+  $("#passwordForm")?.addEventListener("submit", handlePasswordChange);
   $$("#sectionMenu button").forEach((button) => button.addEventListener("click", () => { currentSection = button.dataset.section; renderSectionEditor(); }));
   $("#exportDataButton").addEventListener("click", exportData);
   $("#importDataInput").addEventListener("change", (event) => importData(event.target));

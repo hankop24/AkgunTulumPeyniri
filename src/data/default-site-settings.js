@@ -6,8 +6,6 @@ export const defaultSiteSettings = {
   announcementSecondary: "Geleneksel lezzet, özenle paketlenir",
   whatsappNumber: "905000000000",
   phoneNumber: "+905000000000",
-  freeShippingTarget: 2500,
-  lowStockLimit: 10,
   heroEyebrow: "Akgün Erzincan Tulum Peyniri",
   heroTitle: "Doğal, sade ve premium bir yöresel ürün deneyimi.",
   heroText: "Geleneksel Erzincan lezzetlerini modern ambalajla buluşturan Akgün, tulum peynirinden bala, kaşardan pekmeze kadar sofralara güven veren bir tat taşır.",
@@ -32,6 +30,11 @@ export const defaultSiteSettings = {
   testimonialsTitle: "Sofralardan gelenler",
   faqEyebrow: "SSS",
   faqTitle: "Sık Sorulan Sorular",
-  footerText: "Geleneksel Erzincan lezzetlerinin modern e-ticaret deneyimi.",
+  heroImage: "assets/product-family.png",
+  heroImageFit: "contain",
+  heroImagePosition: "center center",
+  storyImage: "assets/product-wrap.png",
+  storyImageFit: "cover",
+  storyImagePosition: "center center",
   whatsappDefaultMessage: "Merhaba, Akgün Erzincan Tulum Peyniri hakkında bilgi almak istiyorum."
 };

@@ -1009,29 +1009,6 @@ h2 {
   font-weight: 900;
 }
 
-.shipping-progress {
-  display: grid !important;
-  gap: 10px;
-  margin-bottom: 18px !important;
-}
-
-.shipping-progress i {
-  overflow: hidden;
-  display: block;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--cream-2);
-}
-
-.shipping-progress b {
-  display: block;
-  width: 0;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--gold);
-  transition: width 0.25s ease;
-}
-
 .remove-cart-item {
   color: #8b2d2d;
 }
@@ -1409,5 +1386,65 @@ h2 {
 
   .whatsapp-fixed span {
     display: none;
+  }
+}
+
+/* EXELERA geliştirici alanı - admin panelinden yönetilmez */
+.site-footer {
+  flex-wrap: wrap;
+}
+.footer-brand-block {
+  display: grid;
+  gap: 10px;
+  min-width: 220px;
+}
+.developer-credit {
+  display: grid;
+  gap: 5px;
+  min-width: 210px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 250, 241, 0.8);
+  color: var(--green);
+}
+.developer-credit span,
+.developer-credit small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.developer-credit strong {
+  font-size: 22px;
+  letter-spacing: 0.12em;
+  font-weight: 900;
+}
+.developer-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+.developer-socials a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #fffaf1;
+  border: 1px solid var(--line);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+}
+@media (max-width: 760px) {
+  .site-footer,
+  .footer-links,
+  .developer-credit {
+    align-items: flex-start;
+  }
+  .footer-links {
+    flex-wrap: wrap;
   }
 }
