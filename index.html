@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Akgün Erzincan Tulum Peyniri | E-Ticaret UI</title>
-    <meta name="description" content="Akgün Erzincan Tulum Peyniri ve yöresel ürünler için modern e-ticaret arayüzü." />
+    <title>Akgün Erzincan Tulum Peyniri | Yöresel Ürünler</title>
+    <meta name="description" content="Akgün Erzincan Tulum Peyniri ve yöresel ürünler için modern online mağaza." />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,8 +19,8 @@
 
   <body>
     <div class="announcement">
-      <span>2500 TL üzeri ücretsiz soğuk zincir kargo</span>
-      <span>Geleneksel lezzet, özenle paketlenir</span>
+      <span data-setting="announcementPrimary">2500 TL üzeri ücretsiz soğuk zincir kargo</span>
+      <span data-setting="announcementSecondary">Geleneksel lezzet, özenle paketlenir</span>
     </div>
 
     <header class="site-header" id="top">
@@ -39,7 +39,7 @@
       </nav>
 
       <div class="header-actions">
-        <button class="ghost-btn">Giriş Yap</button>
+        <a class="ghost-btn" href="admin/">Admin Paneli</a>
 
         <button class="cart-btn" id="cartOpen">
           Sepet <span id="cartCount">0</span>
@@ -50,35 +50,35 @@
     <main>
       <section class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">Akgün Erzincan Tulum Peyniri</p>
+          <p class="eyebrow" data-setting="heroEyebrow">Akgün Erzincan Tulum Peyniri</p>
 
-          <h1>Doğal, sade ve premium bir yöresel ürün deneyimi.</h1>
+          <h1 data-setting="heroTitle">Doğal, sade ve premium bir yöresel ürün deneyimi.</h1>
 
-          <p class="hero-text">
+          <p class="hero-text" data-setting="heroText">
             Geleneksel Erzincan lezzetlerini modern ambalajla buluşturan Akgün,
             tulum peynirinden bala, kaşardan pekmeze kadar sofralara güven veren
             bir tat taşır.
           </p>
 
           <div class="hero-actions">
-            <a class="primary-btn" href="#products">Ürünleri İncele</a>
-            <a class="secondary-btn" href="#story">Markayı Tanı</a>
+            <a class="primary-btn" href="#products" data-setting="heroPrimaryButton">Ürünleri İncele</a>
+            <a class="secondary-btn" href="#story" data-setting="heroSecondaryButton">Markayı Tanı</a>
           </div>
 
           <div class="hero-stats">
             <div>
-              <strong>100%</strong>
-              <span>Doğal lezzet</span>
+              <strong data-setting="statOneValue">100%</strong>
+              <span data-setting="statOneLabel">Doğal lezzet</span>
             </div>
 
             <div>
-              <strong>24s</strong>
-              <span>Hızlı dönüş</span>
+              <strong data-setting="statTwoValue">24s</strong>
+              <span data-setting="statTwoLabel">Hızlı dönüş</span>
             </div>
 
             <div>
-              <strong>4.9</strong>
-              <span>Müşteri puanı</span>
+              <strong data-setting="statThreeValue">4.9</strong>
+              <span data-setting="statThreeLabel">Müşteri puanı</span>
             </div>
           </div>
         </div>
@@ -114,10 +114,10 @@
       <section class="featured-showcase" id="featured">
         <div class="section-heading compact">
           <p class="eyebrow">Seçili Ürünler</p>
-          <h2>Markanın vitrindeki güçlü ürünleri.</h2>
-          <p>
+          <h2 data-setting="featuredTitle">Markanın vitrindeki güçlü ürünleri.</h2>
+          <p data-setting="featuredText">
             Kavanoz, vakum paket, gurme sarım ve set ürünlerini hızlıca
-            inceleyebilmen için ayrı bir vitrin alanı ekledim.
+            inceleyebilmen için seçili ürünler alanını hazırladık.
           </p>
         </div>
 
@@ -127,9 +127,9 @@
       <section class="section-heading" id="products">
         <p class="eyebrow">Online Mağaza</p>
         <h2>Ürünler</h2>
-        <p>
+        <p data-setting="productsText">
           Tulum peyniri, kaşar, bal, tereyağı, pekmez ve diğer yöresel ürünleri
-          daha düzenli filtre, arama ve ürün detay yapısıyla listeledim.
+          filtreleyerek inceleyebilirsin.
         </p>
       </section>
 
@@ -191,8 +191,7 @@
           </label>
 
           <div class="filter-note">
-            <strong>Not:</strong> Ürünler, gramajlar ve fiyatlar taslak amaçlıdır.
-            Gerçek bilgiler daha sonra kolayca güncellenebilir.
+            <strong>Not:</strong> Güncel ürün, gramaj ve fiyat bilgileri admin paneli üzerinden yönetilir.
           </div>
         </aside>
 
@@ -209,11 +208,10 @@
       <section class="story" id="story">
         <div>
           <p class="eyebrow">Marka Hikayesi</p>
-          <h2>Minimal tasarım, geleneksel Erzincan lezzeti.</h2>
-          <p>
-            Akgün için hazırlanan bu UI, markanın sade logosuna uygun olarak krem,
-            koyu yeşil ve altın tonlarıyla tasarlandı. Amaç; güvenilir, temiz ve
-            premium bir Erzincan yöresel ürün markası hissi vermek.
+          <h2 data-setting="storyTitle">Minimal tasarım, geleneksel Erzincan lezzeti.</h2>
+          <p data-setting="storyText">
+            Akgün; Erzincan’ın geleneksel lezzetini sade, güvenilir ve premium bir
+            marka deneyimiyle sofralara ulaştırır.
           </p>
         </div>
 
@@ -256,18 +254,18 @@
         </details>
 
         <details>
-          <summary>Ürün bilgileri gerçek mi?</summary>
-          <p>Bu dosyada ürün isimleri, gramajlar ve fiyatlar UI sunumu için örnektir. Gerçek veriler daha sonra düzenlenebilir.</p>
+          <summary>Ürün bilgileri nasıl güncellenir?</summary>
+          <p>Ürün adı, gramaj, fiyat, stok ve görsel bilgileri admin paneli üzerinden güncellenebilir.</p>
         </details>
 
         <details>
-          <summary>Bu site ödeme alıyor mu?</summary>
-          <p>Hayır. Bu ilk sürüm UI/prototip amaçlıdır. Ödeme entegrasyonu daha sonra eklenebilir.</p>
+          <summary>Sipariş nasıl tamamlanır?</summary>
+          <p>Sepete eklenen ürünler WhatsApp sipariş metnine çevrilir ve müşteri temsilcisine aktarılır.</p>
         </details>
 
         <details>
-          <summary>Ürün detayları nasıl düzenlenir?</summary>
-          <p>Ürün adı, fiyat, gramaj, stok ve görsel bilgileri script.js dosyasındaki ürün listesinden kolayca değiştirilebilir.</p>
+          <summary>Kampanyalar nasıl yönetilir?</summary>
+          <p>Admin panelinden eski fiyat, rozet, stok ve öne çıkan ürün ayarları düzenlenerek kampanya görünümü oluşturulabilir.</p>
         </details>
 
         <details>
@@ -287,7 +285,7 @@
         <a href="#products">Ürünler</a>
         <a href="#quality">Kalite</a>
         <a href="#faq">SSS</a>
-        <a href="https://wa.me/905000000000" target="_blank">WhatsApp</a>
+        <a href="https://wa.me/905000000000" target="_blank" data-whatsapp-link>WhatsApp</a>
       </div>
     </footer>
 
@@ -326,191 +324,14 @@
     </aside>
 
     <div class="mobile-contact-bar" aria-label="Hızlı iletişim">
-      <a href="https://wa.me/905000000000" target="_blank" rel="noopener">SORU SOR</a>
-      <a href="tel:+905000000000">TELEFON ET</a>
+      <a href="https://wa.me/905000000000" target="_blank" data-whatsapp-link rel="noopener">SORU SOR</a>
+      <a href="tel:+905000000000" data-phone-link>TELEFON ET</a>
     </div>
+    <a class="whatsapp-fixed" data-whatsapp-link href="https://wa.me/905000000000" target="_blank" rel="noopener" aria-label="WhatsApp ile iletişime geç">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16.02 3.2C9 3.2 3.3 8.82 3.3 15.74c0 2.27.62 4.48 1.8 6.42L3.2 29l7.05-1.83a12.85 12.85 0 0 0 5.77 1.4c7.02 0 12.72-5.62 12.72-12.54S23.04 3.2 16.02 3.2Zm0 23.23c-1.82 0-3.6-.48-5.15-1.39l-.37-.22-4.18 1.09 1.12-4.03-.25-.39a10.22 10.22 0 0 1-1.58-5.45c0-5.75 4.66-10.43 10.4-10.43 5.75 0 10.43 4.68 10.43 10.43 0 5.74-4.68 10.39-10.42 10.39Zm5.72-7.78c-.31-.16-1.84-.91-2.12-1.01-.29-.11-.5-.16-.71.16-.21.31-.82 1.01-1 1.22-.18.21-.37.23-.68.08-.31-.16-1.32-.49-2.52-1.55-.93-.83-1.56-1.85-1.74-2.16-.18-.31-.02-.48.14-.64.14-.14.31-.37.47-.55.16-.18.21-.31.31-.52.1-.21.05-.39-.03-.55-.08-.16-.71-1.7-.97-2.33-.26-.61-.52-.53-.71-.54h-.6c-.21 0-.55.08-.84.39-.29.31-1.1 1.08-1.1 2.62s1.13 3.04 1.29 3.25c.16.21 2.23 3.4 5.4 4.76.75.32 1.34.52 1.8.66.76.24 1.45.21 2 .13.61-.09 1.84-.75 2.1-1.48.26-.73.26-1.35.18-1.48-.08-.13-.29-.21-.6-.37Z" /></svg>
+      <span>WhatsApp</span>
+    </a>
 
-    <script src="script.js"></script>
-
-    <script>
-      /*
-        SADECE GÖRSEL DÜZELTME KISMI
-        Bu script mevcut script.js yapısını, sepeti, filtreyi ve tasarımı değiştirmez.
-        Görseli olmayan ürünlere ürüne uygun sabit internet görselleri bağlar.
-      */
-
-      const internetProductImages = {
-        "Bal": "https://loremflickr.com/900/700/honey,jar?lock=1001",
-
-        "Kaşar Peyniri": "https://loremflickr.com/900/700/cheese,block?lock=1002",
-        "Göbek Kaşar": "https://loremflickr.com/900/700/cheese,wheel?lock=1003",
-        "Kolot Kaşar": "https://loremflickr.com/900/700/cheese,dairy?lock=1004",
-        "Karadaş Tost Kaşar": "https://loremflickr.com/900/700/toast,cheese?lock=1005",
-
-        "Karadaş Yemeklik Tereyağı": "https://loremflickr.com/900/700/butter,block?lock=1006",
-        "Yayık Yağı": "https://loremflickr.com/900/700/butter,jar?lock=1007",
-
-        "Erzincan Salamura İnek Peyniri": "https://loremflickr.com/900/700/white,cheese?lock=1008",
-        "Erzurum Göğermiş Peyniri": "https://loremflickr.com/900/700/blue,cheese?lock=1009",
-        "Çeçil Peyniri": "https://loremflickr.com/900/700/string,cheese?lock=1010",
-        "Dil Peyniri": "https://loremflickr.com/900/700/mozzarella,cheese?lock=1011",
-        "Örgü Peyniri": "https://loremflickr.com/900/700/braided,cheese?lock=1012",
-        "Van Otlu Peyniri": "https://loremflickr.com/900/700/herb,cheese?lock=1013",
-        "Koyun Ezine Peyniri": "https://loremflickr.com/900/700/feta,cheese?lock=1014",
-        "İnek Ezine Peyniri": "https://loremflickr.com/900/700/cheese,block?lock=1015",
-
-        "Erzincan Dut Pekmezi": "https://loremflickr.com/900/700/molasses,jar?lock=1016",
-        "Erzincan Karadut Pekmezi": "https://loremflickr.com/900/700/mulberry,syrup?lock=1017",
-
-        "Erzincan Dermason Fasulye": "https://loremflickr.com/900/700/white,beans?lock=1018",
-        "Erzincan Şeker Fasulye": "https://loremflickr.com/900/700/beans,dry?lock=1019",
-
-        "Erzincan Kuru Kayısı": "https://loremflickr.com/900/700/dried,apricots?lock=1020"
-      };
-
-      const internetProductFallbacks = {
-        "Bal": "https://placehold.co/900x700/f7d36b/17382b?text=Bal",
-        "Kaşar Peyniri": "https://placehold.co/900x700/f3d36b/17382b?text=Kasar+Peyniri",
-        "Göbek Kaşar": "https://placehold.co/900x700/f3d36b/17382b?text=Gobek+Kasar",
-        "Kolot Kaşar": "https://placehold.co/900x700/f3d36b/17382b?text=Kolot+Kasar",
-        "Karadaş Tost Kaşar": "https://placehold.co/900x700/f3d36b/17382b?text=Tost+Kasar",
-        "Karadaş Yemeklik Tereyağı": "https://placehold.co/900x700/f8e08c/17382b?text=Tereyagi",
-        "Yayık Yağı": "https://placehold.co/900x700/f8e08c/17382b?text=Yayik+Yagi",
-        "Erzincan Salamura İnek Peyniri": "https://placehold.co/900x700/faf3df/17382b?text=Salamura+Peynir",
-        "Erzurum Göğermiş Peyniri": "https://placehold.co/900x700/e9efe8/17382b?text=Gogermis+Peynir",
-        "Çeçil Peyniri": "https://placehold.co/900x700/faf3df/17382b?text=Cecil+Peyniri",
-        "Dil Peyniri": "https://placehold.co/900x700/faf3df/17382b?text=Dil+Peyniri",
-        "Örgü Peyniri": "https://placehold.co/900x700/faf3df/17382b?text=Orgu+Peyniri",
-        "Van Otlu Peyniri": "https://placehold.co/900x700/e9f1dc/17382b?text=Van+Otlu+Peynir",
-        "Koyun Ezine Peyniri": "https://placehold.co/900x700/faf3df/17382b?text=Koyun+Ezine",
-        "İnek Ezine Peyniri": "https://placehold.co/900x700/faf3df/17382b?text=Inek+Ezine",
-        "Erzincan Dut Pekmezi": "https://placehold.co/900x700/5b2d20/fff7e8?text=Dut+Pekmezi",
-        "Erzincan Karadut Pekmezi": "https://placehold.co/900x700/3f2032/fff7e8?text=Karadut+Pekmezi",
-        "Erzincan Dermason Fasulye": "https://placehold.co/900x700/efe3c8/17382b?text=Dermason+Fasulye",
-        "Erzincan Şeker Fasulye": "https://placehold.co/900x700/efe3c8/17382b?text=Seker+Fasulye",
-        "Erzincan Kuru Kayısı": "https://placehold.co/900x700/e99a3f/17382b?text=Kuru+Kayisi"
-      };
-
-      function updateProductImageData() {
-        if (typeof products === "undefined" || !Array.isArray(products)) return;
-
-        products.forEach((product) => {
-          if (internetProductImages[product.title]) {
-            product.image = internetProductImages[product.title];
-          }
-        });
-      }
-
-      function attachImageFallbacks() {
-        document.querySelectorAll("img").forEach((img) => {
-          const alt = img.getAttribute("alt") || "";
-          const fallback = internetProductFallbacks[alt];
-
-          if (!fallback) return;
-
-          img.onerror = function () {
-            this.onerror = null;
-            this.src = fallback;
-          };
-        });
-      }
-
-      function rerenderAfterImagePatch() {
-        updateProductImageData();
-
-        if (typeof renderFeaturedProducts === "function") {
-          renderFeaturedProducts();
-        }
-
-        if (typeof renderProducts === "function") {
-          renderProducts();
-        }
-
-        if (typeof renderCart === "function") {
-          renderCart();
-        }
-
-        attachImageFallbacks();
-      }
-
-      rerenderAfterImagePatch();
-
-      const imageObserver = new MutationObserver(() => {
-        attachImageFallbacks();
-      });
-
-      imageObserver.observe(document.body, {
-        childList: true,
-        subtree: true
-      });
-    </script>
+    <script type="module" src="src/main.js"></script>
   </body>
-  <a
-  class="whatsapp-fixed"
-  href="https://wa.me/905000000000?text=Merhaba%2C%20Akg%C3%BCn%20Erzincan%20Tulum%20Peyniri%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum."
-  target="_blank"
-  rel="noopener"
-  aria-label="WhatsApp ile iletişime geç"
->
-  <svg viewBox="0 0 32 32" aria-hidden="true">
-    <path
-      d="M16.02 3.2C9 3.2 3.3 8.82 3.3 15.74c0 2.27.62 4.48 1.8 6.42L3.2 29l7.05-1.83a12.85 12.85 0 0 0 5.77 1.4c7.02 0 12.72-5.62 12.72-12.54S23.04 3.2 16.02 3.2Zm0 23.23c-1.82 0-3.6-.48-5.15-1.39l-.37-.22-4.18 1.09 1.12-4.03-.25-.39a10.22 10.22 0 0 1-1.58-5.45c0-5.75 4.66-10.43 10.4-10.43 5.75 0 10.43 4.68 10.43 10.43 0 5.74-4.68 10.39-10.42 10.39Zm5.72-7.78c-.31-.16-1.84-.91-2.12-1.01-.29-.11-.5-.16-.71.16-.21.31-.82 1.01-1 1.22-.18.21-.37.23-.68.08-.31-.16-1.32-.49-2.52-1.55-.93-.83-1.56-1.85-1.74-2.16-.18-.31-.02-.48.14-.64.14-.14.31-.37.47-.55.16-.18.21-.31.31-.52.1-.21.05-.39-.03-.55-.08-.16-.71-1.7-.97-2.33-.26-.61-.52-.53-.71-.54h-.6c-.21 0-.55.08-.84.39-.29.31-1.1 1.08-1.1 2.62s1.13 3.04 1.29 3.25c.16.21 2.23 3.4 5.4 4.76.75.32 1.34.52 1.8.66.76.24 1.45.21 2 .13.61-.09 1.84-.75 2.1-1.48.26-.73.26-1.35.18-1.48-.08-.13-.29-.21-.6-.37Z"
-    />
-  </svg>
-  <span>WhatsApp</span>
-</a>
-
-<style>
-  .whatsapp-fixed {
-    position: fixed;
-    right: 24px;
-    bottom: 24px;
-    z-index: 9999;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 15px 20px;
-    border-radius: 999px;
-    background: #25d366;
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 800;
-    text-decoration: none;
-    box-shadow: 0 18px 42px rgba(37, 211, 102, 0.35);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .whatsapp-fixed:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 22px 48px rgba(37, 211, 102, 0.45);
-  }
-
-  .whatsapp-fixed svg {
-    width: 25px;
-    height: 25px;
-    fill: currentColor;
-    flex-shrink: 0;
-  }
-
-  @media (max-width: 768px) {
-    .whatsapp-fixed {
-      right: 16px;
-      bottom: 78px;
-      width: 56px;
-      height: 56px;
-      padding: 0;
-      justify-content: center;
-    }
-
-    .whatsapp-fixed span {
-      display: none;
-    }
-
-    .whatsapp-fixed svg {
-      width: 28px;
-      height: 28px;
-    }
-  }
-</style>
 </html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Akgün Admin Paneli</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <aside class="admin-sidebar">
+      <a class="admin-brand" href="../index.html">
+        <img src="../assets/logo-akgun.png" alt="Akgün" />
+      </a>
+      <nav>
+        <button class="nav-tab active" data-tab="dashboard">Genel Bakış</button>
+        <button class="nav-tab" data-tab="products">Ürün Yönetimi</button>
+        <button class="nav-tab" data-tab="settings">Site Ayarları</button>
+        <button class="nav-tab" data-tab="data">Veri / Yedek</button>
+      </nav>
+      <a class="view-site" href="../index.html" target="_blank">Siteyi Aç</a>
+    </aside>
+
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div>
+          <p class="eyebrow">Akgün Yönetim Paneli</p>
+          <h1>Ürün, fiyat, kampanya ve site içeriklerini yönet.</h1>
+        </div>
+        <div class="topbar-actions">
+          <button class="secondary" id="resetAllButton">Varsayılana Dön</button>
+          <button class="primary" id="saveAllButton">Tümünü Kaydet</button>
+        </div>
+      </header>
+
+      <section class="tab-panel active" id="dashboardPanel">
+        <div class="stat-grid">
+          <article><span>Toplam Ürün</span><strong id="statProducts">0</strong></article>
+          <article><span>Aktif Ürün</span><strong id="statActive">0</strong></article>
+          <article><span>Öne Çıkan</span><strong id="statFeatured">0</strong></article>
+          <article><span>Düşük Stok</span><strong id="statLowStock">0</strong></article>
+        </div>
+        <div class="admin-card">
+          <h2>Panel Mantığı</h2>
+          <p>Bu sürüm statik siteye uygun admin temelidir. Ürünler ve ayarlar tarayıcıdaki localStorage alanına kaydedilir. Aynı tarayıcıda siteyi açtığında değişiklikleri görürsün. Gerçek sunucu/Firebase bağlandığında aynı dosya yapısı korunarak veriler online yönetilebilir.</p>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="productsPanel">
+        <div class="section-line">
+          <div>
+            <h2>Ürün Yönetimi</h2>
+            <p>Ürün ekle, fiyat değiştir, stok/kampanya/öne çıkan ayarlarını düzenle.</p>
+          </div>
+          <button class="primary" id="newProductButton">Yeni Ürün Ekle</button>
+        </div>
+        <div class="product-admin-layout">
+          <div class="admin-card table-card">
+            <div class="toolbar">
+              <input id="adminSearch" type="search" placeholder="Ürün ara..." />
+              <select id="adminCategoryFilter"></select>
+            </div>
+            <div class="product-table" id="productTable"></div>
+          </div>
+          <form class="admin-card product-form" id="productForm">
+            <h3 id="formTitle">Ürün Düzenle</h3>
+            <input type="hidden" id="productId" />
+            <label>Ürün adı<input id="productTitle" required /></label>
+            <label>Açıklama<textarea id="productDesc" rows="4"></textarea></label>
+            <div class="form-grid">
+              <label>Kategori<select id="productCategory"></select></label>
+              <label>Gramaj<input id="productWeight" placeholder="500g" /></label>
+              <label>Fiyat<input id="productPrice" type="number" min="0" /></label>
+              <label>Eski fiyat<input id="productOldPrice" type="number" min="0" /></label>
+              <label>Stok<input id="productStock" type="number" min="0" /></label>
+              <label>Puan<input id="productRating" type="number" min="0" max="5" step="0.1" /></label>
+              <label>Menşei<input id="productOrigin" /></label>
+              <label>Rozet<input id="productBadge" placeholder="Yeni / Kampanya" /></label>
+            </div>
+            <label>Görsel yolu / URL<input id="productImage" placeholder="assets/product-tub.png" /></label>
+            <label>Etiketler<textarea id="productTags" rows="2" placeholder="Kavanoz, Aile boyu, Soğuk zincir"></textarea></label>
+            <div class="switch-grid">
+              <label><input id="productFeatured" type="checkbox" /> Öne çıkan</label>
+              <label><input id="productBestSeller" type="checkbox" /> Çok satan</label>
+              <label><input id="productActive" type="checkbox" /> Aktif ürün</label>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="danger" id="deleteProductButton">Sil</button>
+              <button type="submit" class="primary">Ürünü Kaydet</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="settingsPanel">
+        <form class="admin-card settings-form" id="settingsForm">
+          <h2>Site Ayarları</h2>
+          <div class="form-grid two">
+            <label>WhatsApp numarası<input id="whatsappNumber" placeholder="905XXXXXXXXX" /></label>
+            <label>Telefon numarası<input id="phoneNumber" placeholder="+905XXXXXXXXX" /></label>
+            <label>Ücretsiz kargo limiti<input id="freeShippingTarget" type="number" min="0" /></label>
+            <label>Sayfa başlığı<input id="pageTitle" /></label>
+          </div>
+          <label>Meta açıklama<textarea id="metaDescription" rows="2"></textarea></label>
+          <div class="form-grid two">
+            <label>Duyuru 1<input id="announcementPrimary" /></label>
+            <label>Duyuru 2<input id="announcementSecondary" /></label>
+          </div>
+          <label>Hero küçük başlık<input id="heroEyebrow" /></label>
+          <label>Hero başlık<textarea id="heroTitle" rows="2"></textarea></label>
+          <label>Hero açıklama<textarea id="heroText" rows="3"></textarea></label>
+          <div class="form-grid three">
+            <label>İstatistik 1 değer<input id="statOneValue" /></label>
+            <label>İstatistik 2 değer<input id="statTwoValue" /></label>
+            <label>İstatistik 3 değer<input id="statThreeValue" /></label>
+          </div>
+          <div class="form-grid three">
+            <label>İstatistik 1 metin<input id="statOneLabel" /></label>
+            <label>İstatistik 2 metin<input id="statTwoLabel" /></label>
+            <label>İstatistik 3 metin<input id="statThreeLabel" /></label>
+          </div>
+          <label>Öne çıkanlar başlığı<input id="featuredTitle" /></label>
+          <label>Öne çıkanlar metni<textarea id="featuredText" rows="2"></textarea></label>
+          <label>Ürünler metni<textarea id="productsText" rows="2"></textarea></label>
+          <label>Marka hikayesi başlığı<input id="storyTitle" /></label>
+          <label>Marka hikayesi metni<textarea id="storyText" rows="3"></textarea></label>
+          <label>Varsayılan WhatsApp mesajı<textarea id="whatsappDefaultMessage" rows="2"></textarea></label>
+          <div class="form-actions right"><button type="submit" class="primary">Ayarları Kaydet</button></div>
+        </form>
+      </section>
+
+      <section class="tab-panel" id="dataPanel">
+        <div class="admin-card">
+          <h2>Yedekleme ve Aktarım</h2>
+          <p>Ürünleri ve site ayarlarını JSON olarak dışa aktarabilir, daha sonra tekrar içe aktarabilirsin.</p>
+          <div class="data-actions">
+            <button class="primary" id="exportButton">JSON Dışa Aktar</button>
+            <label class="file-button">JSON İçe Aktar<input id="importInput" type="file" accept="application/json" hidden /></label>
+          </div>
+          <textarea id="dataPreview" rows="14" readonly></textarea>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast"></div>
+    <script type="module" src="admin.js"></script>
+  </body>
+</html>
