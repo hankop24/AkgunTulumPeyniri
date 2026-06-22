@@ -83,11 +83,10 @@ function switchView(viewName) {
 }
 
 function renderDashboard() {
-  const lowLimit = Number(settings.lowStockLimit || 10);
   $("#statProducts").textContent = products.length;
   $("#statActive").textContent = products.filter((p) => p.active !== false).length;
   $("#statFeatured").textContent = products.filter((p) => p.featured).length;
-  $("#statLowStock").textContent = products.filter((p) => Number(p.stock) <= lowLimit).length;
+  $("#statLowStock").textContent = products.filter((p) => Number(p.stock) <= 0).length;
 }
 
 function categoryOptions(selected = "") {
@@ -112,14 +111,14 @@ function productMatchesFilters(product) {
   if (status === "featured" && !product.featured) return false;
   if (status === "bestSeller" && !product.bestSeller) return false;
   if (status === "campaign" && !product.campaignActive) return false;
-  if (status === "low-stock" && Number(product.stock) > Number(settings.lowStockLimit || 10)) return false;
+  if (status === "out-of-stock" && Number(product.stock) > 0) return false;
   return true;
 }
 
 function renderProductsTable() {
   const filtered = orderItems(products).filter(productMatchesFilters);
   const rows = filtered.map((product) => {
-    const low = Number(product.stock) <= Number(settings.lowStockLimit || 10);
+    const outOfStock = Number(product.stock) <= 0;
     return `
       <div class="table-row">
         <div class="table-img"><img src="${imageSrc(productImages(product)[0])}" style="${imageStyle(productImages(product)[0])}" onerror="this.src='../assets/product-akgun.png'" alt="${product.title}" /></div>
@@ -131,7 +130,7 @@ function renderProductsTable() {
           ${product.featured ? `<span class="tag">Öne çıkan</span>` : ""}
           ${product.bestSeller ? `<span class="tag blue">Çok satan</span>` : ""}
           ${product.campaignActive ? `<span class="tag orange">Kampanya</span>` : ""}
-          ${low ? `<span class="tag orange">Az stok</span>` : ""}
+          ${outOfStock ? `<span class="tag orange">Stok yok</span>` : ""}
         </div>
         <div class="row-actions">
           <button data-edit-product="${product.id}">Düzenle</button>
@@ -425,8 +424,6 @@ function fillSettingsForm() {
   $("#settingPageTitle").value = settings.pageTitle || "";
   $("#settingWhatsappNumber").value = settings.whatsappNumber || "";
   $("#settingPhoneNumber").value = settings.phoneNumber || "";
-  $("#settingFreeShippingTarget").value = settings.freeShippingTarget || 0;
-  $("#settingLowStockLimit").value = settings.lowStockLimit || 10;
   $("#settingMetaDescription").value = settings.metaDescription || "";
   $("#settingWhatsappDefaultMessage").value = settings.whatsappDefaultMessage || "";
 }
@@ -439,8 +436,6 @@ async function saveSettingsForm(event) {
     pageTitle: $("#settingPageTitle").value,
     whatsappNumber: slugPhone($("#settingWhatsappNumber").value),
     phoneNumber: $("#settingPhoneNumber").value,
-    freeShippingTarget: Number($("#settingFreeShippingTarget").value || 0),
-    lowStockLimit: Number($("#settingLowStockLimit").value || 10),
     metaDescription: $("#settingMetaDescription").value,
     whatsappDefaultMessage: $("#settingWhatsappDefaultMessage").value
   });
@@ -451,8 +446,24 @@ async function saveSettingsForm(event) {
 const textInput = (id, label, value = "") => `<label>${label}<input data-setting-field="${id}" value="${String(value || "").replaceAll('"', '&quot;')}" /></label>`;
 const textArea = (id, label, value = "", rows = 3) => `<label>${label}<textarea data-setting-field="${id}" rows="${rows}">${value || ""}</textarea></label>`;
 const imageInput = (id, label, value = "") => `
-  <label>${label}<input data-setting-field="${id}" value="${String(value || "").replaceAll('"', '&quot;')}" placeholder="assets/... veya https://..." /></label>
-  <label class="file-drop">Görsel dosyası seç<input data-setting-file="${id}" type="file" accept="image/*" /></label>
+  <div class="section-image-editor">
+    <label>${label}<input data-setting-field="${id}" value="${String(value || "").replaceAll('"', '&quot;')}" placeholder="assets/... veya https://..." /></label>
+    <div class="section-image-preview"><img src="${value || '../assets/product-akgun.png'}" onerror="this.src='../assets/product-akgun.png'" alt="${label} önizleme" /></div>
+    <div class="form-grid two">
+      <label>Görsel görünümü
+        <select data-setting-field="${id}Fit">
+          <option value="cover" ${settings[`${id}Fit`] !== "contain" ? "selected" : ""}>Alanı doldur / kırp</option>
+          <option value="contain" ${settings[`${id}Fit`] === "contain" ? "selected" : ""}>Tamamı görünsün</option>
+        </select>
+      </label>
+      <label>Odak noktası
+        <select data-setting-field="${id}Position">
+          ${["center center", "top center", "bottom center", "left center", "right center"].map(pos => `<option value="${pos}" ${settings[`${id}Position`] === pos ? "selected" : ""}>${pos}</option>`).join("")}
+        </select>
+      </label>
+    </div>
+    <label class="file-drop">Görsel dosyası seç<input data-setting-file="${id}" type="file" accept="image/*" /></label>
+  </div>
 `;
 
 function renderSectionEditor() {
@@ -498,10 +509,7 @@ function renderSectionEditor() {
     textInput("faqTitle", "Başlık", settings.faqTitle)
   ]);
   if (currentSection === "navigation") root.innerHTML = renderListBlock("Menü Linkleri", "Üst menüde görünen bağlantıları yönet.", "navLinks");
-  if (currentSection === "footer") root.innerHTML = renderSettingsBlock("Footer", "Sayfanın en altındaki marka metni ve iletişim alanı.", [
-    textArea("footerText", "Footer metni", settings.footerText, 3),
-    textInput("whatsappDefaultMessage", "Sabit WhatsApp butonu mesajı", settings.whatsappDefaultMessage)
-  ]);
+  if (currentSection === "social") root.innerHTML = renderListBlock("Sosyal Medya", "Sitede görünen sosyal medya bağlantılarını buradan yönet.", "socialLinks");
   bindSectionEditorEvents();
 }
 
@@ -551,6 +559,7 @@ function renderListItem(type, item, index) {
   if (type === "testimonials") return `<div class="item-card">${base}<label>Yorum<textarea data-list-field="text" rows="3">${item.text || ""}</textarea></label><label>Ad Soyad / Kısa isim<input data-list-field="name" value="${item.name || ""}" /></label></div>`;
   if (type === "faqs") return `<div class="item-card">${base}<label>Soru<input data-list-field="question" value="${item.question || ""}" /></label><label>Cevap<textarea data-list-field="answer" rows="3">${item.answer || ""}</textarea></label><label class="inline-switch"><input data-list-field="open" type="checkbox" ${item.open ? "checked" : ""} /> Açık gelsin</label></div>`;
   if (type === "navLinks") return `<div class="item-card">${base}<div class="form-grid two"><label>Menü adı<input data-list-field="label" value="${item.label || ""}" /></label><label>Bağlantı<input data-list-field="href" value="${item.href || "#"}" /></label></div></div>`;
+  if (type === "socialLinks") return `<div class="item-card">${base}<div class="form-grid three"><label>Sosyal medya adı<input data-list-field="label" value="${item.label || ""}" placeholder="Instagram" /></label><label>İkon kısa adı<input data-list-field="icon" value="${item.icon || ""}" placeholder="instagram" /></label><label>Bağlantı<input data-list-field="href" value="${item.href || "#"}" placeholder="https://..." /></label></div></div>`;
   return "";
 }
 
@@ -612,7 +621,8 @@ function emptyListItem(type) {
     benefits: { id, no: String(order).padStart(2, "0"), title: "Yeni Özellik", text: "Açıklama", active: true, order },
     testimonials: { id, text: "Yeni yorum metni", name: "Müşteri", active: true, order },
     faqs: { id, question: "Yeni soru", answer: "Cevap metni", open: false, active: true, order },
-    navLinks: { id, label: "Yeni Link", href: "#", active: true, order }
+    navLinks: { id, label: "Yeni Link", href: "#", active: true, order },
+    socialLinks: { id, label: "Instagram", icon: "instagram", href: "#", active: true, order }
   };
   return map[type];
 }

@@ -15,6 +15,16 @@ let modalProductId = null;
 const qs = (selector) => document.querySelector(selector);
 const qsa = (selector) => Array.from(document.querySelectorAll(selector));
 const byOrder = (items = []) => [...items].filter((item) => item.active !== false).sort((a, b) => Number(a.order || 999) - Number(b.order || 999));
+const socialIcon = (icon = "") => {
+  const key = String(icon || "").toLowerCase();
+  if (key.includes("instagram")) return "IG";
+  if (key.includes("facebook")) return "FB";
+  if (key.includes("whatsapp")) return "WP";
+  if (key.includes("youtube")) return "YT";
+  if (key.includes("tiktok")) return "TK";
+  if (key.includes("x") || key.includes("twitter")) return "X";
+  return (String(icon || "SM").slice(0, 2) || "SM").toUpperCase();
+};
 
 function setText(selector, value) {
   const element = qs(selector);
@@ -38,8 +48,16 @@ function applySiteSettings() {
 
   const heroImage = qs(".hero-visual img");
   if (heroImage && settings.heroImage) heroImage.src = settings.heroImage;
+  if (heroImage) {
+    heroImage.style.objectFit = settings.heroImageFit || "contain";
+    heroImage.style.objectPosition = settings.heroImagePosition || "center center";
+  }
   const storyImage = qs(".story img");
   if (storyImage && settings.storyImage) storyImage.src = settings.storyImage;
+  if (storyImage) {
+    storyImage.style.objectFit = settings.storyImageFit || "cover";
+    storyImage.style.objectPosition = settings.storyImagePosition || "center center";
+  }
   const topCard = qs(".floating-card.top-card");
   if (topCard && settings.heroTopCard) topCard.textContent = settings.heroTopCard;
   const bottomCard = qs(".floating-card.bottom-card");
@@ -58,6 +76,20 @@ function renderNavigation() {
   const nav = qs("#mainNav");
   if (!nav) return;
   nav.innerHTML = byOrder(content.navLinks || []).map((link) => `<a href="${link.href}">${link.label}</a>`).join("");
+}
+
+function renderSocialLinks() {
+  const container = qs("#socialLinks");
+  if (!container) return;
+  const links = byOrder(content.socialLinks || []).filter((link) => link.href);
+  container.innerHTML = links.map((link) => `
+    <a class="social-link" href="${link.href}" target="_blank" rel="noopener">
+      <span>${socialIcon(link.icon || link.label)}</span>
+      <strong>${link.label || "Sosyal medya"}</strong>
+    </a>
+  `).join("");
+  const section = qs("#socialMedia");
+  if (section) section.hidden = links.length === 0;
 }
 
 function renderCategoryFilters() {
@@ -227,8 +259,7 @@ function renderProducts() {
   }
 
   productGrid.innerHTML = visibleProducts.map((product) => {
-    const lowStockLimit = Number(settings.lowStockLimit || 10);
-    const stockClass = product.stock <= lowStockLimit ? "low" : "";
+    const stockClass = product.stock <= 0 ? "low" : "";
     const discount = product.oldPrice ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100) : 0;
     return `
       <article class="product-card">
@@ -244,7 +275,7 @@ function renderProducts() {
           <p>${product.desc}</p>
           <div class="product-tags">${(product.tags || []).slice(0, 3).map((tag) => `<span>${tag}</span>`).join("")}</div>
           <div class="stock-line ${stockClass}">
-            <span>${product.stock <= 0 ? "Stok yok" : product.stock <= lowStockLimit ? "Az kaldı" : "Stokta"}</span>
+            <span>${product.stock <= 0 ? "Stok yok" : "Stokta"}</span>
           </div>
           <div class="product-meta">
             <div class="price-block">
@@ -292,26 +323,13 @@ function cartTotalValue() {
 function renderCart() {
   const cartCount = qs("#cartCount");
   const cartTotal = qs("#cartTotal");
-  const cartShipping = qs("#cartShipping");
-  const cartProgress = qs("#cartProgress");
   const cartItems = qs("#cartItems");
   if (!cartItems) return;
 
   const count = cart.reduce((sum, item) => sum + item.qty, 0);
   const total = cartTotalValue();
-  const freeShippingTarget = Number(settings.freeShippingTarget || 0);
-  const remaining = Math.max(freeShippingTarget - total, 0);
-  const progress = freeShippingTarget > 0 ? Math.min((total / freeShippingTarget) * 100, 100) : 100;
-
   if (cartCount) cartCount.textContent = count;
   if (cartTotal) cartTotal.textContent = money(total);
-  if (cartShipping) cartShipping.textContent = !cart.length
-    ? "Ücretsiz kargo için ürün ekleyin."
-    : remaining === 0
-      ? "Ücretsiz soğuk zincir kargo kazandınız."
-      : `${money(remaining)} daha ekleyin, ücretsiz soğuk zincir kargo kazanın.`;
-  if (cartProgress) cartProgress.style.width = `${progress}%`;
-
   if (!cart.length) {
     cartItems.innerHTML = `<div class="empty-cart">Sepetiniz henüz boş.<br />Ürünlerden birini ekleyerek başlayın.</div>`;
     return;
@@ -457,6 +475,7 @@ export async function initStorefront() {
   setCategoryLabels();
   applySiteSettings();
   renderNavigation();
+  renderSocialLinks();
   renderCategoryFilters();
   renderBenefits();
   renderTestimonials();

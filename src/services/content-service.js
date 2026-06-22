@@ -15,7 +15,8 @@ export function normalizeContent(content = {}) {
     benefits: withIds(merged.benefits, "benefit"),
     testimonials: withIds(merged.testimonials, "testimonial"),
     faqs: withIds(merged.faqs, "faq"),
-    navLinks: withIds(merged.navLinks, "nav")
+    navLinks: withIds(merged.navLinks, "nav"),
+    socialLinks: withIds(merged.socialLinks, "social")
   };
 }
 

@@ -10,12 +10,8 @@
     <link rel="stylesheet" href="admin.css" />
   </head>
   <body class="admin-loading">
-    <section class="auth-loading-screen" id="authLoadingScreen" role="status" aria-live="polite">
-      <div class="auth-loading-card">
-        <img src="../assets/logo-akgun.png" alt="Akgün" />
-        <strong>Yönetim paneli hazırlanıyor...</strong>
-        <span>Oturum kontrol ediliyor.</span>
-      </div>
+    <section class="auth-loading-screen" id="authLoadingScreen" role="status" aria-label="Oturum kontrol ediliyor">
+      <span class="admin-loader-spinner" aria-hidden="true"></span>
     </section>
     <section class="login-screen" id="loginScreen" hidden>
       <form class="login-card" id="loginForm">
@@ -75,7 +71,7 @@
             <article><span>Toplam ürün</span><strong id="statProducts">0</strong></article>
             <article><span>Aktif ürün</span><strong id="statActive">0</strong></article>
             <article><span>Öne çıkan</span><strong id="statFeatured">0</strong></article>
-            <article><span>Düşük stok</span><strong id="statLowStock">0</strong></article>
+            <article><span>Stokta olmayan</span><strong id="statLowStock">0</strong></article>
           </div>
 
           <div class="dashboard-grid">
@@ -120,7 +116,7 @@
                 <option value="featured">Öne çıkanlarda gösterilenler</option>
                 <option value="bestSeller">Çok satan olarak işaretlenenler</option>
                 <option value="campaign">Kampanyası aktif olanlar</option>
-                <option value="low-stock">Düşük stok</option>
+                <option value="out-of-stock">Stokta olmayanlar</option>
               </select>
             </div>
             <div class="products-table" id="productsTable"></div>
@@ -235,14 +231,14 @@
               <button data-section="testimonials">Yorumlar</button>
               <button data-section="faq">SSS</button>
               <button data-section="navigation">Menü Linkleri</button>
-              <button data-section="footer">Footer</button>
+              <button data-section="social">Sosyal Medya</button>
             </aside>
 
             <div class="sections-editor" id="sectionsEditor"></div>
           </div>
         </section>
 
-        <section class="view" id="settingsView" data-title="Site Ayarları" data-desc="Marka, iletişim, SEO, kargo ve WhatsApp ayarlarını düzenle.">
+        <section class="view" id="settingsView" data-title="Site Ayarları" data-desc="Marka, iletişim, SEO ve WhatsApp ayarlarını düzenle.">
           <form class="panel-card settings-card" id="settingsForm">
             <h2>Genel Site Ayarları</h2>
             <div class="form-grid two">
@@ -250,8 +246,6 @@
               <label>Tarayıcı başlığı<input id="settingPageTitle" /></label>
               <label>WhatsApp numarası<input id="settingWhatsappNumber" placeholder="905XXXXXXXXX" /><small>Örnek: 905537996024 veya 05537996024. Sistem otomatik WhatsApp formatına çevirir.</small></label>
               <label>Telefon numarası<input id="settingPhoneNumber" placeholder="+905XXXXXXXXX" /><small>Telefon butonu için kullanılır. Boş bırakılırsa WhatsApp numarası kullanılır.</small></label>
-              <label>Ücretsiz kargo limiti<input id="settingFreeShippingTarget" type="number" min="0" /></label>
-              <label>Düşük stok limiti<input id="settingLowStockLimit" type="number" min="0" /></label>
             </div>
             <label>Meta açıklama<textarea id="settingMetaDescription" rows="3"></textarea></label>
             <label>Varsayılan WhatsApp mesajı<textarea id="settingWhatsappDefaultMessage" rows="3"></textarea></label>

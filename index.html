@@ -18,10 +18,8 @@
   </head>
 
   <body class="site-loading">
-    <div class="storefront-loader" id="storefrontLoader" role="status" aria-live="polite">
-      <img src="assets/logo-akgun.png" alt="Akgün" />
-      <strong>Akgün yükleniyor...</strong>
-      <span>Ürünler ve sayfa içerikleri hazırlanıyor.</span>
+    <div class="storefront-loader" id="storefrontLoader" role="status" aria-label="Sayfa yükleniyor">
+      <span class="loader-spinner" aria-hidden="true"></span>
     </div>
     <div class="announcement">
       <span data-setting="announcementPrimary">2500 TL üzeri ücretsiz soğuk zincir kargo</span>
@@ -277,12 +275,20 @@
           <p>Sepete eklenen ürünler otomatik sipariş metnine çevrilir ve WhatsApp bağlantısına aktarılır.</p>
         </details>
       </section>
+
+      <section class="social-section" id="socialMedia" aria-label="Sosyal medya hesapları">
+        <div class="section-heading compact">
+          <p class="eyebrow">Sosyal Medya</p>
+          <h2>Bizi sosyal medyada takip edin</h2>
+        </div>
+        <div class="social-links" id="socialLinks"></div>
+      </section>
     </main>
 
     <footer class="site-footer">
-      <div>
+      <div class="footer-brand">
         <img src="assets/logo-akgun.png" alt="Akgün Erzincan Tulum Peyniri" />
-        <p data-setting="footerText">Geleneksel Erzincan lezzetlerinin modern e-ticaret deneyimi.</p>
+        <p>Geleneksel Erzincan lezzetlerinin modern e-ticaret deneyimi.</p>
       </div>
 
       <div class="footer-links">
@@ -290,6 +296,20 @@
         <a href="#quality">Kalite</a>
         <a href="#faq">SSS</a>
         <a href="https://wa.me/905000000000" target="_blank" data-whatsapp-link>WhatsApp</a>
+      </div>
+
+      <div class="developer-credit" aria-label="Geliştirici bilgisi">
+        <div class="exelera-logo" aria-hidden="true">EX</div>
+        <div>
+          <span>Bu site</span>
+          <strong>EXELERA STUDIO</strong>
+          <span>tarafından geliştirildi.</span>
+          <div class="exelera-socials">
+            <a href="#" aria-label="Exelera Instagram">IG</a>
+            <a href="#" aria-label="Exelera LinkedIn">IN</a>
+            <a href="#" aria-label="Exelera web sitesi">WEB</a>
+          </div>
+        </div>
       </div>
     </footer>
 
@@ -302,11 +322,6 @@
       <div class="cart-items" id="cartItems"></div>
 
       <div class="cart-summary">
-        <div class="shipping-progress">
-          <span id="cartShipping">Ücretsiz kargo için ürün ekleyin.</span>
-          <i><b id="cartProgress"></b></i>
-        </div>
-
         <div>
           <span>Ara Toplam</span>
           <strong id="cartTotal">₺0</strong>

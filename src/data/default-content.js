@@ -31,5 +31,10 @@ export const defaultContent = {
     { label: "Marka Hikayesi", href: "#story", active: true, order: 3 },
     { label: "Kalite", href: "#quality", active: true, order: 4 },
     { label: "SSS", href: "#faq", active: true, order: 5 }
+  ],
+  socialLinks: [
+    { label: "Instagram", href: "#", icon: "instagram", active: true, order: 1 },
+    { label: "Facebook", href: "#", icon: "facebook", active: true, order: 2 },
+    { label: "WhatsApp", href: "#", icon: "whatsapp", active: true, order: 3 }
   ]
 };
