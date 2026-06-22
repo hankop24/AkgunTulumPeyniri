@@ -429,3 +429,50 @@ body.admin-loading .admin-shell { display: none !important; }
   object-position: center;
   display: block;
 }
+
+
+/* Admin panel responsive son düzenlemeler */
+@media (max-width: 1180px) {
+  .admin-shell { grid-template-columns: 260px 1fr; }
+  .table-row { grid-template-columns: 58px 1fr 120px 90px 110px 160px; }
+}
+@media (max-width: 980px) {
+  .admin-shell { grid-template-columns: 1fr; }
+  .sidebar { position: relative; height: auto; padding: 18px; }
+  .brand-card { display: flex; align-items: center; gap: 14px; }
+  .brand-card img { width: 110px; margin: 0; }
+  .side-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .workspace { padding: 20px; }
+  .topbar, .page-headline { flex-direction: column; }
+  .topbar-actions, .editor-actions-top { width: 100%; }
+  .topbar-actions .btn, .editor-actions-top .btn { flex: 1; }
+  .dashboard-grid, .product-editor-grid, .sections-layout { grid-template-columns: 1fr; }
+  .section-menu { position: relative; top: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .list-toolbar { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .workspace { padding: 16px; }
+  .side-nav, .section-menu, .form-grid.two, .form-grid.three, .stats-grid { grid-template-columns: 1fr; }
+  .brand-card { align-items: flex-start; flex-direction: column; }
+  .brand-card img { width: 132px; }
+  .panel-card { padding: 18px; border-radius: 20px; }
+  .table-row { grid-template-columns: 56px 1fr; gap: 10px; padding: 12px; }
+  .table-row.header { display: none; }
+  .table-row > div:nth-child(n+3) { grid-column: 2; }
+  .row-actions { justify-content: flex-start; flex-wrap: wrap; }
+  .row-actions button { flex: 1; min-width: 92px; }
+  .gallery-preview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .selected-image-editor-head { align-items: flex-start; flex-direction: column; }
+  .login-card { padding: 24px; border-radius: 24px; }
+  .login-card img { width: 136px; }
+  .data-actions { flex-direction: column; }
+  .data-actions .btn, .file-inline { width: 100%; justify-content: center; }
+}
+@media (max-width: 480px) {
+  .topbar-actions, .editor-actions-top, .inline-actions { flex-direction: column; }
+  .topbar-actions .btn, .editor-actions-top .btn, .inline-actions .btn { width: 100%; }
+  h1 { font-size: 30px; }
+  .page-headline h2 { font-size: 25px; }
+  .gallery-preview { grid-template-columns: 1fr; }
+}

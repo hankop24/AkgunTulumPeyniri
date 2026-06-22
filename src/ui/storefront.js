@@ -17,13 +17,23 @@ const qsa = (selector) => Array.from(document.querySelectorAll(selector));
 const byOrder = (items = []) => [...items].filter((item) => item.active !== false).sort((a, b) => Number(a.order || 999) - Number(b.order || 999));
 const socialIcon = (icon = "") => {
   const key = String(icon || "").toLowerCase();
-  if (key.includes("instagram")) return "IG";
-  if (key.includes("facebook")) return "FB";
-  if (key.includes("whatsapp")) return "WP";
-  if (key.includes("youtube")) return "YT";
-  if (key.includes("tiktok")) return "TK";
-  if (key.includes("x") || key.includes("twitter")) return "X";
-  return (String(icon || "SM").slice(0, 2) || "SM").toUpperCase();
+  const svg = {
+    instagram: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.8 2h8.4A5.8 5.8 0 0 1 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8A5.8 5.8 0 0 1 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2Zm0 2A3.8 3.8 0 0 0 4 7.8v8.4A3.8 3.8 0 0 0 7.8 20h8.4a3.8 3.8 0 0 0 3.8-3.8V7.8A3.8 3.8 0 0 0 16.2 4H7.8Zm4.2 3.3A4.7 4.7 0 1 1 12 16.7a4.7 4.7 0 0 1 0-9.4Zm0 2A2.7 2.7 0 1 0 12 14.7a2.7 2.7 0 0 0 0-5.4Zm5.05-2.95a1.1 1.1 0 1 1-1.1 1.1 1.1 1.1 0 0 1 1.1-1.1Z"/></svg>',
+    facebook: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.6 22v-8.2h2.8l.42-3.2H13.6V8.55c0-.93.26-1.56 1.6-1.56h1.7V4.13A23 23 0 0 0 14.42 4c-2.45 0-4.13 1.5-4.13 4.24v2.36H7.5v3.2h2.79V22h3.31Z"/></svg>',
+    whatsapp: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.52 3.48A11.84 11.84 0 0 0 12.08 0C5.5 0 .15 5.32.15 11.86c0 2.09.55 4.13 1.6 5.93L0 24l6.37-1.67a11.98 11.98 0 0 0 5.71 1.45h.01C18.67 23.78 24 18.46 24 11.91c0-3.18-1.23-6.17-3.48-8.43ZM12.09 21.76h-.01a9.94 9.94 0 0 1-5.06-1.38l-.36-.22-3.78.99 1.01-3.67-.24-.38a9.78 9.78 0 0 1-1.5-5.24c0-5.42 4.45-9.83 9.94-9.83a9.9 9.9 0 0 1 7.02 2.9 9.78 9.78 0 0 1 2.91 6.98c0 5.43-4.45 9.85-9.93 9.85Zm5.45-7.37c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15s-.77.97-.95 1.17c-.18.2-.35.22-.65.07-.3-.15-1.27-.46-2.42-1.47-.9-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.05 1.03-1.05 2.5s1.08 2.9 1.23 3.1c.15.2 2.13 3.24 5.16 4.54.72.31 1.29.5 1.73.64.73.23 1.39.2 1.91.12.58-.09 1.77-.72 2.02-1.41.25-.7.25-1.3.17-1.41-.07-.13-.27-.2-.57-.35Z"/></svg>',
+    youtube: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.55 3.6 12 3.6 12 3.6s-7.55 0-9.4.5A3 3 0 0 0 .5 6.2 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.85.5 9.4.5 9.4.5s7.55 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.3 31.3 0 0 0 24 12a31.3 31.3 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.25 3.6L9.6 15.6Z"/></svg>',
+    tiktok: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.6 2c.25 2.1 1.45 3.52 3.48 3.66v3.13a7.4 7.4 0 0 1-3.5-.9v6.55c0 4.15-2.54 6.68-6.13 6.68A5.76 5.76 0 0 1 4.5 15.3a5.82 5.82 0 0 1 7.03-5.68v3.38c-.35-.11-.7-.17-1.08-.17a2.42 2.42 0 1 0 2.45 2.42V2h3.7Z"/></svg>',
+    x: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.95 10.4 22.1 1h-1.93l-7.08 8.16L7.44 1H.92l8.55 12.35L.92 23h1.93l7.48-8.61L16.31 23h6.52l-8.88-12.6Zm-2.65 3.05-.87-1.23L3.54 2.44h2.98l5.56 7.9.87 1.23 7.22 10.25h-2.98l-5.89-8.37Z"/></svg>',
+    linkedin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 1 1 0 3.5a2.5 2.5 0 0 1 4.98 0ZM.43 8.1h4.1V24H.43V8.1Zm7.25 0h3.93v2.18h.06c.55-1.04 1.88-2.14 3.87-2.14 4.14 0 4.9 2.72 4.9 6.26V24h-4.1v-8.5c0-2.03-.04-4.64-2.83-4.64-2.83 0-3.26 2.2-3.26 4.49V24H6.15V8.1h1.53Z"/></svg>'
+  };
+  if (key.includes("instagram")) return svg.instagram;
+  if (key.includes("facebook")) return svg.facebook;
+  if (key.includes("whatsapp")) return svg.whatsapp;
+  if (key.includes("youtube")) return svg.youtube;
+  if (key.includes("tiktok")) return svg.tiktok;
+  if (key.includes("linkedin")) return svg.linkedin;
+  if (key === "x" || key.includes("twitter")) return svg.x;
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 .01 0ZM7 11h10v2H7v-2Z"/></svg>';
 };
 
 function setText(selector, value) {
