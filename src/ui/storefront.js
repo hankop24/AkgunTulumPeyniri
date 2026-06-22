@@ -37,17 +37,9 @@ function applySiteSettings() {
   Object.entries(settings).forEach(([key, value]) => setText(`[data-setting='${key}']`, value));
 
   const heroImage = qs(".hero-visual img");
-  if (heroImage && settings.heroImage) {
-    heroImage.src = settings.heroImage;
-    heroImage.style.objectFit = settings.heroImageFit || "contain";
-    heroImage.style.objectPosition = settings.heroImagePosition || "center center";
-  }
+  if (heroImage && settings.heroImage) heroImage.src = settings.heroImage;
   const storyImage = qs(".story img");
-  if (storyImage && settings.storyImage) {
-    storyImage.src = settings.storyImage;
-    storyImage.style.objectFit = settings.storyImageFit || "cover";
-    storyImage.style.objectPosition = settings.storyImagePosition || "center center";
-  }
+  if (storyImage && settings.storyImage) storyImage.src = settings.storyImage;
   const topCard = qs(".floating-card.top-card");
   if (topCard && settings.heroTopCard) topCard.textContent = settings.heroTopCard;
   const bottomCard = qs(".floating-card.bottom-card");
@@ -140,6 +132,7 @@ function getVisibleProducts() {
   if (onlyStock) list = list.filter((product) => product.stock > 0);
   if (sort === "price-asc") list.sort((a, b) => a.price - b.price);
   if (sort === "price-desc") list.sort((a, b) => b.price - a.price);
+  if (sort === "rating") list.sort((a, b) => Number(a.order || 999) - Number(b.order || 999));
   if (sort === "popular") list.sort((a, b) => Number(b.bestSeller) - Number(a.bestSeller) || Number(a.order || 999) - Number(b.order || 999));
   return list;
 }
@@ -234,14 +227,15 @@ function renderProducts() {
   }
 
   productGrid.innerHTML = visibleProducts.map((product) => {
-    const stockClass = product.stock <= 0 ? "low" : "";
-    const hasDiscount = Number(product.oldPrice || 0) > Number(product.price || 0);
+    const lowStockLimit = Number(settings.lowStockLimit || 10);
+    const stockClass = product.stock <= lowStockLimit ? "low" : "";
+    const discount = product.oldPrice ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100) : 0;
     return `
       <article class="product-card">
         <div class="product-image">
           <img src="${imageSrc(productImages(product)[0])}" style="${imageStyle(productImages(product)[0])}" onerror="this.src='assets/product-akgun.png'" alt="${product.title}" />
           ${product.bestSeller ? `<span class="badge best-seller-badge">Çok satan</span>` : ""}
-          ${hasDiscount ? `<span class="discount-badge">İndirimli</span>` : ""}
+          ${discount > 0 ? `<span class="discount-badge">%${discount}</span>` : ""}
           ${product.campaignActive ? `<span class="campaign-badge">Kampanya</span>` : ""}
         </div>
         <div class="product-info">
@@ -250,7 +244,7 @@ function renderProducts() {
           <p>${product.desc}</p>
           <div class="product-tags">${(product.tags || []).slice(0, 3).map((tag) => `<span>${tag}</span>`).join("")}</div>
           <div class="stock-line ${stockClass}">
-            <span>${product.stock <= 0 ? "Stok yok" : "Stokta"}</span>
+            <span>${product.stock <= 0 ? "Stok yok" : product.stock <= lowStockLimit ? "Az kaldı" : "Stokta"}</span>
           </div>
           <div class="product-meta">
             <div class="price-block">
@@ -298,13 +292,26 @@ function cartTotalValue() {
 function renderCart() {
   const cartCount = qs("#cartCount");
   const cartTotal = qs("#cartTotal");
+  const cartShipping = qs("#cartShipping");
+  const cartProgress = qs("#cartProgress");
   const cartItems = qs("#cartItems");
   if (!cartItems) return;
 
   const count = cart.reduce((sum, item) => sum + item.qty, 0);
   const total = cartTotalValue();
+  const freeShippingTarget = Number(settings.freeShippingTarget || 0);
+  const remaining = Math.max(freeShippingTarget - total, 0);
+  const progress = freeShippingTarget > 0 ? Math.min((total / freeShippingTarget) * 100, 100) : 100;
+
   if (cartCount) cartCount.textContent = count;
   if (cartTotal) cartTotal.textContent = money(total);
+  if (cartShipping) cartShipping.textContent = !cart.length
+    ? "Ücretsiz kargo için ürün ekleyin."
+    : remaining === 0
+      ? "Ücretsiz soğuk zincir kargo kazandınız."
+      : `${money(remaining)} daha ekleyin, ücretsiz soğuk zincir kargo kazanın.`;
+  if (cartProgress) cartProgress.style.width = `${progress}%`;
+
   if (!cart.length) {
     cartItems.innerHTML = `<div class="empty-cart">Sepetiniz henüz boş.<br />Ürünlerden birini ekleyerek başlayın.</div>`;
     return;
@@ -443,6 +450,8 @@ function bindEvents() {
 }
 
 export async function initStorefront() {
+  document.body.classList.add("site-loading");
+
   [products, settings, content] = await Promise.all([getProducts(), getSiteSettings(), getContent()]);
   products = products.filter((product) => product.active !== false);
   setCategoryLabels();
@@ -457,4 +466,9 @@ export async function initStorefront() {
   renderProducts();
   renderCart();
   bindEvents();
+
+  requestAnimationFrame(() => {
+    document.body.classList.remove("site-loading");
+    document.body.classList.add("site-ready");
+  });
 }
