@@ -88,18 +88,6 @@ export async function signOutAdmin() {
   return api.signOut(api.auth);
 }
 
-export async function changeAdminPassword(currentPassword, newPassword) {
-  const api = await ensureFirebase();
-  const user = api.auth.currentUser;
-  if (!user?.email) throw new Error("Şifre değiştirmek için tekrar giriş yapmalısın.");
-  if (!currentPassword || !newPassword) throw new Error("Mevcut şifre ve yeni şifre zorunlu.");
-
-  const credential = api.EmailAuthProvider.credential(user.email, currentPassword);
-  await api.reauthenticateWithCredential(user, credential);
-  await api.updatePassword(user, newPassword);
-  return true;
-}
-
 export async function getCurrentAdmin() {
   const api = await ensureFirebase();
   return api.auth.currentUser;
@@ -108,6 +96,20 @@ export async function getCurrentAdmin() {
 export async function onAdminAuthStateChanged(callback) {
   const api = await ensureFirebase();
   return api.onAuthStateChanged(api.auth, callback);
+}
+
+export async function updateAdminPassword(currentPassword, newPassword) {
+  const api = await ensureFirebase();
+  const user = api.auth.currentUser;
+
+  if (!user || !user.email) {
+    throw new Error("Şifreyi güncellemek için admin girişi yapmalısın.");
+  }
+
+  const credential = api.EmailAuthProvider.credential(user.email, currentPassword);
+  await api.reauthenticateWithCredential(user, credential);
+  await api.updatePassword(user, newPassword);
+  return true;
 }
 
 export async function readDoc(collectionName, docId) {
@@ -122,7 +124,7 @@ export async function writeDoc(collectionName, docId, data) {
   if (!isFirebaseConfigured()) return null;
   const api = await ensureFirebase();
   const ref = api.doc(api.db, collectionName, docId);
-  await api.setDoc(ref, { ...data, updatedAt: new Date().toISOString() });
+  await api.setDoc(ref, { ...data, updatedAt: new Date().toISOString() }, { merge: true });
   return data;
 }
 
@@ -138,7 +140,7 @@ export async function writeCollectionDoc(collectionName, id, data) {
   if (!isFirebaseConfigured()) return null;
   const api = await ensureFirebase();
   const ref = api.doc(api.db, collectionName, String(id));
-  await api.setDoc(ref, { ...data, id: String(id), updatedAt: new Date().toISOString() });
+  await api.setDoc(ref, { ...data, id: String(id), updatedAt: new Date().toISOString() }, { merge: true });
   return data;
 }
 

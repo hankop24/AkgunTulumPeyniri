@@ -239,18 +239,32 @@
         </section>
 
         <section class="view" id="settingsView" data-title="Site Ayarları" data-desc="Marka, iletişim, SEO ve WhatsApp ayarlarını düzenle.">
-          <form class="panel-card settings-card" id="settingsForm">
-            <h2>Genel Site Ayarları</h2>
-            <div class="form-grid two">
-              <label>Marka adı<input id="settingBrandName" /></label>
-              <label>Tarayıcı başlığı<input id="settingPageTitle" /></label>
-              <label>WhatsApp numarası<input id="settingWhatsappNumber" placeholder="905XXXXXXXXX" /><small>Örnek: 905537996024 veya 05537996024. Sistem otomatik WhatsApp formatına çevirir.</small></label>
-              <label>Telefon numarası<input id="settingPhoneNumber" placeholder="+905XXXXXXXXX" /><small>Telefon butonu için kullanılır. Boş bırakılırsa WhatsApp numarası kullanılır.</small></label>
-            </div>
-            <label>Meta açıklama<textarea id="settingMetaDescription" rows="3"></textarea></label>
-            <label>Varsayılan WhatsApp mesajı<textarea id="settingWhatsappDefaultMessage" rows="3"></textarea></label>
-            <div class="form-footer"><button class="btn primary" type="submit">Ayarları Kaydet</button></div>
-          </form>
+          <div class="settings-stack">
+            <form class="panel-card settings-card" id="settingsForm">
+              <h2>Genel Site Ayarları</h2>
+              <div class="form-grid two">
+                <label>Marka adı<input id="settingBrandName" /></label>
+                <label>Tarayıcı başlığı<input id="settingPageTitle" /></label>
+                <label>WhatsApp numarası<input id="settingWhatsappNumber" placeholder="905XXXXXXXXX" /><small>Örnek: 905537996024 veya 05537996024. Sistem otomatik WhatsApp formatına çevirir.</small></label>
+                <label>Telefon numarası<input id="settingPhoneNumber" placeholder="+905XXXXXXXXX" /><small>Telefon butonu için kullanılır. Boş bırakılırsa WhatsApp numarası kullanılır.</small></label>
+              </div>
+              <label>Meta açıklama<textarea id="settingMetaDescription" rows="3"></textarea></label>
+              <label>Varsayılan WhatsApp mesajı<textarea id="settingWhatsappDefaultMessage" rows="3"></textarea></label>
+              <div class="form-footer"><button class="btn primary" type="submit">Ayarları Kaydet</button></div>
+            </form>
+
+            <form class="panel-card settings-card" id="changePasswordForm" autocomplete="off">
+              <h2>Şifreyi Yenile</h2>
+              <p>Admin hesabının şifresini güvenli şekilde buradan güncelleyebilirsin.</p>
+              <div class="form-grid two">
+                <label>Mevcut şifre<input id="currentPassword" type="password" autocomplete="current-password" placeholder="Mevcut şifren" /></label>
+                <label>Yeni şifre<input id="newPassword" type="password" autocomplete="new-password" placeholder="Yeni şifre" /></label>
+              </div>
+              <label>Yeni şifre (tekrar)<input id="confirmNewPassword" type="password" autocomplete="new-password" placeholder="Yeni şifreyi tekrar yaz" /></label>
+              <small id="changePasswordMessage"></small>
+              <div class="form-footer"><button class="btn primary" type="submit">Şifreyi Güncelle</button></div>
+            </form>
+          </div>
         </section>
 
         <section class="view" id="dataView" data-title="Veri & Yayın" data-desc="Yedek al, JSON içe aktar veya Firebase’e varsayılan verileri gönder.">

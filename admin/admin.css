@@ -136,6 +136,10 @@ label { display: grid; gap: 8px; color: #334155; font-weight: 760; font-size: 14
 .item-head strong { font-size: 15px; }
 .form-footer { display: flex; justify-content: flex-end; margin-top: 18px; }
 .settings-card { max-width: 980px; }
+.settings-stack { display: grid; gap: 18px; max-width: 980px; }
+#changePasswordMessage { min-height: 20px; font-weight: 700; }
+#changePasswordMessage.success { color: var(--success); }
+#changePasswordMessage.error { color: #b42318; }
 .data-card textarea { margin-top: 16px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
 .file-inline { display: inline-flex; align-items: center; }
 

@@ -1,7 +1,7 @@
 import { getProducts, saveProduct, deleteProduct, saveProducts, createEmptyProduct } from "../src/services/catalog-service.js";
 import { getSiteSettings, saveSiteSettings } from "../src/services/site-settings-service.js";
 import { getContent, saveContent, normalizeContent } from "../src/services/content-service.js";
-import { getBackendStatus, seedFirebase, isFirebaseConfigured, signInAdmin, signOutAdmin, onAdminAuthStateChanged, uploadImageFile } from "../src/services/backend-service.js";
+import { getBackendStatus, seedFirebase, isFirebaseConfigured, signInAdmin, signOutAdmin, onAdminAuthStateChanged, uploadImageFile, updateAdminPassword } from "../src/services/backend-service.js";
 import { money, normalizeText, parseTags, slugPhone } from "../src/utils/format.js";
 import { defaultProducts } from "../src/data/default-products.js";
 import { defaultSiteSettings } from "../src/data/default-site-settings.js";
@@ -783,6 +783,59 @@ function bindAuthEvents() {
   });
 }
 
+async function handleChangePassword(event) {
+  event.preventDefault();
+  const currentPassword = $("#currentPassword")?.value || "";
+  const newPassword = $("#newPassword")?.value || "";
+  const confirmPassword = $("#confirmNewPassword")?.value || "";
+  const message = $("#changePasswordMessage");
+
+  if (message) {
+    message.textContent = "";
+    message.className = "";
+  }
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    if (message) {
+      message.textContent = "Lütfen tüm şifre alanlarını doldur.";
+      message.className = "error";
+    }
+    return;
+  }
+
+  if (newPassword.length < 6) {
+    if (message) {
+      message.textContent = "Yeni şifre en az 6 karakter olmalı.";
+      message.className = "error";
+    }
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    if (message) {
+      message.textContent = "Yeni şifreler birbiriyle aynı olmalı.";
+      message.className = "error";
+    }
+    return;
+  }
+
+  try {
+    await updateAdminPassword(currentPassword, newPassword);
+    event.target.reset();
+    if (message) {
+      message.textContent = "Şifren başarıyla güncellendi.";
+      message.className = "success";
+    }
+    toast("Admin şifresi güncellendi.");
+  } catch (error) {
+    console.warn("Şifre güncellenemedi.", error);
+    if (message) {
+      message.textContent = "Mevcut şifre hatalı olabilir veya oturumunu yenilemen gerekebilir.";
+      message.className = "error";
+    }
+  }
+}
+
 async function bootAdminPanel() {
   await loadData();
   renderAll();
@@ -822,6 +875,7 @@ function bindEvents() {
   $("#saveCategoriesButton").addEventListener("click", saveCategoryManager);
   $("#addCategoryManagerButton").addEventListener("click", addCategoryFromManager);
   $("#settingsForm").addEventListener("submit", saveSettingsForm);
+  $("#changePasswordForm")?.addEventListener("submit", handleChangePassword);
   $$("#sectionMenu button").forEach((button) => button.addEventListener("click", () => { currentSection = button.dataset.section; renderSectionEditor(); }));
   $("#exportDataButton").addEventListener("click", exportData);
   $("#importDataInput").addEventListener("change", (event) => importData(event.target));
