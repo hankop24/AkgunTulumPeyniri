@@ -477,63 +477,366 @@ body.admin-loading .admin-shell { display: none !important; }
   .gallery-preview { grid-template-columns: 1fr; }
 }
 
-
-/* Admin mobil son iyileştirme */
-@media (max-width: 900px) {
-  .admin-shell { display: block; }
-  .sidebar {
-    position: relative;
-    height: auto;
-    padding: 16px;
-    border-radius: 0 0 24px 24px;
+/* Son responsive düzenleme - admin panel */
+@media (min-width: 1101px) {
+  .admin-shell {
+    grid-template-columns: 280px minmax(0, 1fr);
   }
+
+  .workspace {
+    max-width: 1500px;
+    width: 100%;
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 1100px) {
+  body {
+    background: #f4f7fb;
+  }
+
+  .admin-shell {
+    display: block;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: auto;
+    padding: 12px;
+    gap: 10px;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.16);
+  }
+
   .brand-card {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 92px 1fr;
     align-items: center;
     gap: 12px;
-    padding: 14px;
+    padding: 12px;
+    border-radius: 18px;
   }
-  .brand-card img { width: 96px; margin: 0; }
+
+  .brand-card img {
+    width: 92px;
+    max-height: 48px;
+    margin: 0;
+    object-fit: contain;
+  }
+
+  .brand-card span {
+    font-size: 17px;
+    line-height: 1.1;
+  }
+
+  .brand-card small {
+    font-size: 12px;
+    margin-top: 3px;
+  }
+
   .side-nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
   }
+
+  .side-nav::-webkit-scrollbar {
+    display: none;
+  }
+
   .side-nav button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 11px 14px;
+    border-radius: 999px;
     text-align: center;
-    padding: 12px 10px;
-    font-size: 13px;
+    background: rgba(255, 255, 255, 0.08);
   }
-  .workspace { padding: 18px; }
-  .topbar-actions { width: 100%; }
-  .topbar-actions .btn { flex: 1 1 160px; }
-}
-@media (max-width: 640px) {
-  .login-card { padding: 24px; border-radius: 24px; }
-  .panel-card { padding: 18px; border-radius: 20px; }
+
+  .connection-card,
+  .admin-user,
+  .site-link {
+    display: none;
+  }
+
+  .workspace {
+    padding: 18px;
+  }
+
+  .topbar {
+    align-items: stretch;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .topbar-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .topbar-actions #saveEverythingButton {
+    grid-column: 1 / -1;
+  }
+
+  .btn {
+    min-height: 44px;
+  }
+
+  .dashboard-grid,
+  .product-editor-grid,
+  .sections-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .section-menu {
+    position: relative;
+    top: auto;
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 10px;
+    scrollbar-width: none;
+  }
+
+  .section-menu::-webkit-scrollbar {
+    display: none;
+  }
+
+  .section-menu button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    border-radius: 999px;
+  }
+
+  .list-toolbar {
+    grid-template-columns: 1fr;
+  }
+
   .page-headline,
-  .editor-headline,
-  .topbar { gap: 12px; }
+  .editor-headline {
+    display: grid;
+    gap: 14px;
+  }
+
   .editor-actions-top,
-  .data-actions,
-  .inline-actions,
-  .form-footer {
+  .page-headline > .btn {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr;
   }
-  .btn { width: 100%; }
-  .products-table { border: 0; display: grid; gap: 12px; }
-  .table-row {
-    display: grid;
-    grid-template-columns: 58px 1fr;
+
+  .form-grid.two,
+  .form-grid.three {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-card {
+    border-radius: 20px;
+    padding: 18px;
+  }
+
+  .hero-card {
+    min-height: auto;
+  }
+
+  .hero-card h2 {
+    font-size: clamp(28px, 7vw, 36px);
+  }
+}
+
+@media (max-width: 760px) {
+  .workspace {
+    padding: 14px;
+  }
+
+  h1 {
+    font-size: 30px;
+  }
+
+  .page-headline h2 {
+    font-size: 26px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
-    border: 1px solid var(--line);
+  }
+
+  .stats-grid article {
+    padding: 16px;
     border-radius: 18px;
   }
-  .table-row.header { display: none; }
-  .table-row > div:nth-child(n+3) { grid-column: 1 / -1; }
-  .row-actions { justify-content: stretch; display: grid; grid-template-columns: 1fr 1fr; }
-  .row-actions button { width: 100%; }
-  .gallery-preview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .selected-image-editor-head { align-items: flex-start; flex-direction: column; }
+
+  .stats-grid strong {
+    font-size: 28px;
+  }
+
+  .table-row.header {
+    display: none;
+  }
+
+  .products-table {
+    display: grid;
+    gap: 12px;
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 10px 14px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+  }
+
+  .table-row > div:nth-child(1) {
+    grid-row: span 2;
+  }
+
+  .table-row > div:nth-child(2) {
+    align-self: center;
+  }
+
+  .table-row > div:nth-child(n+3) {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    padding-top: 8px;
+    border-top: 1px dashed #e2e8f0;
+  }
+
+  .table-row > div:nth-child(3)::before { content: "Kategori"; }
+  .table-row > div:nth-child(4)::before { content: "Fiyat"; }
+  .table-row > div:nth-child(5)::before { content: "Stok"; }
+  .table-row > div:nth-child(6)::before { content: "İşlem"; }
+
+  .table-row > div:nth-child(n+3)::before {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+
+  .row-actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .row-actions button {
+    min-height: 38px;
+    padding-inline: 12px;
+  }
+
+  .gallery-preview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .selected-image-editor-head,
+  .item-head,
+  .block-title {
+    display: grid;
+    gap: 8px;
+  }
+
+  .form-footer,
+  .data-actions,
+  .inline-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .form-footer .btn,
+  .data-actions .btn,
+  .inline-actions .btn {
+    width: 100%;
+  }
+
+  .login-card {
+    padding: 24px;
+    border-radius: 24px;
+  }
+
+  .login-card img {
+    width: 138px;
+  }
+
+  .toast {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    padding: 10px;
+    border-radius: 0 0 20px 20px;
+  }
+
+  .brand-card {
+    grid-template-columns: 76px 1fr;
+  }
+
+  .brand-card img {
+    width: 76px;
+  }
+
+  .brand-card span {
+    font-size: 15px;
+  }
+
+  .brand-card small {
+    display: none;
+  }
+
+  .side-nav button {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .topbar-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-card {
+    padding: 16px;
+  }
+
+  input,
+  textarea,
+  select {
+    border-radius: 13px;
+    padding: 12px;
+  }
+
+  .product-editor-grid {
+    gap: 14px;
+  }
+
+  .gallery-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-item img {
+    height: 160px;
+  }
 }
